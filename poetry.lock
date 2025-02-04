@@ -3580,6 +3580,17 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "python-multipart"
+version = "0.0.20"
+description = "A streaming multipart parser for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104"},
+    {file = "python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13"},
+]
+
+[[package]]
 name = "python-nvd3"
 version = "0.16.0"
 description = "Python NVD3 - Chart Library for d3.js"
@@ -4960,4 +4971,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "bc3fae738f2d6ddb765d29610baa235134135c50acd3305892c1c21c3c453444"
+content-hash = "9be1939ec0e0de8d7a2946c51c43765be7c4c215c2bdce45118d09328e8d0bc7"
