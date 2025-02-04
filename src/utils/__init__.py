@@ -1,2 +1,2 @@
-from src.utils.DirectoryManager import DirectoryManager
-from src.utils.DateTimeManager import DateTimeManager
+from src.utils.directory_manager import DirectoryManager
+from src.utils.date_time_manager import DateTimeManager

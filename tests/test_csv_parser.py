@@ -13,5 +13,13 @@ class TestCsvParser:
         with open(self.test_csv_path, "rb") as f:
             file = UploadFile(f)
             df = await self.paser.read_csv_from_file_upload(file)
-            assert df.columns.tolist() == ["total_bill", "tip", "sex", "smoker", "day", "time", "size"]
+            assert df.columns.tolist() == [
+                "total_bill",
+                "tip",
+                "sex",
+                "smoker",
+                "day",
+                "time",
+                "size",
+            ]
             assert df.shape == (3, 7)
