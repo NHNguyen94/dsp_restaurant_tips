@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -9,3 +11,7 @@ class PredictionResponse(BaseModel):
     time: str
     size: int
     tip: float
+
+class PredictionResponseDataFrame(BaseModel):
+    columns: List[str]
+    data: List[List]
