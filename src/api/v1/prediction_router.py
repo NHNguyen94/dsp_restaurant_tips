@@ -10,7 +10,7 @@ router = APIRouter(tags=["prediction"])
 @router.post("/predict", response_model=PredictionResponse)
 async def predict(
     request_body: Optional[PredictionRequest] = None,
-    input_files: List[UploadFile] = File(None),
+    input_files: UploadFile = File(None),
 ):
     pass
 
