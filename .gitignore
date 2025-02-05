@@ -175,4 +175,8 @@ cython_debug/
 .DS_Store
 */.DS_Store
 
+# data path
 /src/data/
+/src/data_ml_models/raw/
+/src/data_ml_models/processed/
+/src/data_ml_models/feature_engineering/
