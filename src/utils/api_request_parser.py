@@ -18,7 +18,7 @@ class ApiRequestParser:
         return df[self._get_fields()]
 
     async def parse_single_csv_to_request(
-            self, input_csv: UploadFile
+        self, input_csv: UploadFile
     ) -> List[PredictionRequest]:
         try:
             df = await self.csv_parser.read_csv_from_file_upload(input_csv)

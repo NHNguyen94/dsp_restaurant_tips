@@ -12,6 +12,7 @@ class PredictionResponse(BaseModel):
     size: int
     tip: float
 
+
 class PredictionResponseDataFrame(BaseModel):
     columns: List[str]
     data: List[List]

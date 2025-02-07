@@ -11,7 +11,9 @@ model_configs = ModelConfigs()
 def train_model(df: pd.DataFrame) -> XGBRegressor:
     y = df[model_configs.TIP]
     X = df.drop(columns=[model_configs.TIP])
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
     model = XGBRegressor()
     model.fit(X_train, y_train)
     return model
