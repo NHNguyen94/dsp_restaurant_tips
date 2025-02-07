@@ -5,7 +5,8 @@ from src.utils.helper import load_configs
 
 model_path_configs = ModelPathConfigs.get_configs()
 
-def process_data(df: pd.DataFrame) -> pd.DataFrame:
+def process_data(df_input: pd.DataFrame) -> pd.DataFrame:
+    df = df_input.copy()
     try:
         configs = load_configs(model_path_configs.PRE_PROCESSING_CONFIGS_PATH)
         for config in configs["transformations"]:

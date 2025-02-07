@@ -2,14 +2,15 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
 
-from src.utils.configs_manager import ModelPathConfigs
+from src.utils.configs_manager import ModelPathConfigs, ModelConfigs
 
 model_path_configs = ModelPathConfigs.get_configs()
+model_configs = ModelConfigs()
 
 
 def train_model(df: pd.DataFrame) -> XGBRegressor:
-    y = df["tip"]
-    X = df.drop(columns=["tip"])
+    y = df[model_configs.TIP]
+    X = df.drop(columns=[model_configs.TIP])
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     model = XGBRegressor()
     model.fit(X_train, y_train)
