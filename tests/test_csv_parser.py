@@ -4,11 +4,11 @@ from fastapi import UploadFile
 from src.utils.csv_parser import CSVParser
 
 
-@pytest.mark.asyncio
 class TestCsvParser:
     test_csv_path = "tests/resources/test_tips.csv"
     paser = CSVParser()
 
+    @pytest.mark.asyncio
     async def test_read_csv_from_file_upload(self):
         with open(self.test_csv_path, "rb") as f:
             file = UploadFile(f)

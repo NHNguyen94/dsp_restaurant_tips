@@ -7,9 +7,6 @@ pre-process-data:
 train-model:
 	PYTHONPATH=. poetry run python src/ml_pipelines/training.py
 
-test-model:
-	PYTHONPATH=. poetry run python src/ml_pipelines/inference.py
-
 unittest:
 	PYTHONPATH=. poetry run pytest -s tests/
 
