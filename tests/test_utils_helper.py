@@ -1,6 +1,6 @@
-from src.utils.helper import load_configs
-import pytest
 from src.utils.configs_manager import ModelPathConfigs
+from src.utils.helper import load_configs
+
 
 class TestUtilsHelper:
 
