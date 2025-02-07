@@ -8,7 +8,7 @@ from src.utils.api_request_parser import ApiRequestParser
 class TestApiRequestParser:
     test_csv_path = "tests/resources/test_tips.csv"
     parser = ApiRequestParser()
-    selected_columns = ['total_bill', 'sex', 'smoker', 'day', 'time', 'size']
+    selected_columns = ["total_bill", "sex", "smoker", "day", "time", "size"]
 
     @pytest.mark.asyncio
     async def test_parse_single_csv_to_request(self):
@@ -32,12 +32,7 @@ class TestApiRequestParser:
 
     def test_parse_request_to_df(self):
         request = PredictionRequest(
-            total_bill=16.99,
-            sex="Male",
-            smoker="No",
-            day="Sun",
-            time="Dinner",
-            size=2
+            total_bill=16.99, sex="Male", smoker="No", day="Sun", time="Dinner", size=2
         )
         df = self.parser.parse_request_to_df(request)
         assert len(df) == 1

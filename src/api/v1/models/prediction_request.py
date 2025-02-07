@@ -17,7 +17,9 @@ class PredictionRequest(BaseModel):
     @model_validator(mode="after")
     def validate_numbers(self):
         if self.total_bill <= 0:
-            raise HTTPException(status_code=400, detail="total_bill must be greater than 0.")
+            raise HTTPException(
+                status_code=400, detail="total_bill must be greater than 0."
+            )
         if self.size <= 0:
             raise HTTPException(status_code=400, detail="size must be greater than 0.")
         return self

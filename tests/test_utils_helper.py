@@ -3,7 +3,6 @@ from src.utils.helper import load_configs, round_number
 
 
 class TestUtilsHelper:
-
     def test_load_configs(self):
         configs = load_configs(ModelPathConfigs.PRE_PROCESSING_CONFIGS_PATH)
         assert configs is not None

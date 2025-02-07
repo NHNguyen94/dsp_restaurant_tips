@@ -50,5 +50,6 @@ class ModelPathConfigs(PathConfigs):
         ModelPathConfigs.create_needed_directories()
         return ModelPathConfigs
 
-class ModelConfigs():
+
+class ModelConfigs:
     TIP = "tip"

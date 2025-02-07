@@ -3,7 +3,7 @@ import pytest
 
 from src.ml_pipelines.inference import (
     async_predict,
-    async_predict_response_with_features
+    async_predict_response_with_features,
 )
 from src.ml_pipelines.pre_processing import process_data
 from src.utils.configs_manager import ModelPathConfigs, ModelConfigs
@@ -13,7 +13,6 @@ model_configs = ModelConfigs()
 
 
 class TestPredictModel:
-
     @pytest.mark.asyncio
     async def test_async_predict_model(self):
         df = pd.read_csv(model_path_configs.TEST_DATA_PATH)

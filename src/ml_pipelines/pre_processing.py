@@ -5,6 +5,7 @@ from src.utils.helper import load_configs
 
 model_path_configs = ModelPathConfigs.get_configs()
 
+
 def process_data(df_input: pd.DataFrame) -> pd.DataFrame:
     df = df_input.copy()
     try:
