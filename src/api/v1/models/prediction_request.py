@@ -4,7 +4,6 @@ from pydantic import BaseModel, model_validator
 
 from fastapi import HTTPException
 
-
 class PredictionRequest(BaseModel):
     total_bill: Optional[float] = None
     sex: Optional[Literal["Male", "Female"]] = None
@@ -23,4 +22,4 @@ class PredictionRequest(BaseModel):
                 )
             if self.size <= 0:
                 raise HTTPException(status_code=400, detail="size must be greater than 0.")
-            return self
+        return self

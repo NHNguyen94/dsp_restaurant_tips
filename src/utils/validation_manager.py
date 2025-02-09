@@ -1,13 +1,15 @@
-import pandas as pd
 from typing import List
-import great_expectations as gx
+
+import pandas as pd
+
+from src.api.v1.models.prediction_request import PredictionRequest
 
 
 class ValidationManager:
-    def __init__(self):
-        self.df = None
-        self.expectations = []
-        context = gx.get_context()
+    @staticmethod
+    def validate_none_json_request(request: PredictionRequest) -> bool:
+        # Check if all fields of the request are None, return True
+        return all(value is None for value in request.model_dump().values())
 
     @staticmethod
     def check_col_names(df: pd.DataFrame, col_names: List) -> bool:
@@ -22,7 +24,8 @@ class ValidationManager:
         null_rows = df[df.isnull().any(axis=1)].index.tolist()
         return null_rows
 
-    def find_invalid_rows(self, df: pd.DataFrame) -> List:
+    @staticmethod
+    def find_invalid_rows(df: pd.DataFrame) -> List:
         invalid_indices = []
-        invalid_indices.extend(self._find_null_rows(df))
+        invalid_indices.extend(ValidationManager._find_null_rows(df))
         return invalid_indices
