@@ -13,8 +13,8 @@ api_request_parser = ApiRequestParser()
 
 @router.post("/predict", response_model=List[PredictionResponse])
 async def predict(
-    input_json: Annotated[PredictionRequest, Depends()] = None,
-    input_file: Annotated[UploadFile, File()] = None,
+        input_json: Annotated[PredictionRequest, Depends()] = None,
+        input_file: Annotated[UploadFile, File()] = None,
 ):
     if input_json != None:
         df = api_request_parser.parse_request_to_df(input_json)
@@ -23,6 +23,7 @@ async def predict(
     else:
         raise ValueError("Either request body or input file must be provided.")
 
+    # print(f"df: {df}")
     df_with_predictions = await async_predict_response_with_features(df)
     print(df_with_predictions)
     print(df_with_predictions.to_dict(orient="records"))
