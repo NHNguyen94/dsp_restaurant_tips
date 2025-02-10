@@ -7,6 +7,7 @@ class TestDirectoryManager:
     non_exist_test_folder_path = "tests/resources/test_folder_2"
     exist_test_folder_path = "tests/resources/test_folder_1"
     empty_folder_path = "tests/resources/empty_folder"
+    DirectoryManager.create_dir_if_not_exists(empty_folder_path)
 
     def test_check_if_dir_exists(self):
         assert DirectoryManager.check_if_dir_exists(self.exist_test_folder_path) == True
@@ -34,4 +35,7 @@ class TestDirectoryManager:
             "tests/resources/test_folder_1/test_file_3.txt",
         ]
         assert DirectoryManager.get_file_path_in_dir(self.empty_folder_path) == []
-        assert DirectoryManager.get_file_path_in_dir(self.non_exist_test_folder_path) == None
+        assert (
+            DirectoryManager.get_file_path_in_dir(self.non_exist_test_folder_path)
+            == None
+        )
