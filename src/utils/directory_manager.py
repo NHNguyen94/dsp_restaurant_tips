@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 
 class DirectoryManager:
@@ -36,3 +37,10 @@ class DirectoryManager:
     def delete_empty_dir(dir: str) -> None:
         os.rmdir(dir)
         print(f"Directory {dir} deleted")
+
+    @staticmethod
+    def get_file_path_in_dir(folder_path: str) -> List[str] | None:
+        if DirectoryManager.check_if_dir_exists(folder_path):
+            return [os.path.join(folder_path, file) for file in os.listdir(folder_path)]
+        else:
+            return None
