@@ -48,6 +48,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - .:/opt/airflow
     entrypoint: >
       /bin/bash -c "
       exec airflow scheduler
