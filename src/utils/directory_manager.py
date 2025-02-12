@@ -41,6 +41,10 @@ class DirectoryManager:
     @staticmethod
     def get_file_path_in_dir(folder_path: str) -> List[str] | None:
         if DirectoryManager.check_if_dir_exists(folder_path):
-            return [os.path.join(folder_path, file) for file in os.listdir(folder_path)]
+            return [
+                os.path.join(folder_path, file)
+                for file in os.listdir(folder_path)
+                if os.path.isfile(os.path.join(folder_path, file))
+            ]
         else:
             return None
