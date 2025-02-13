@@ -1,6 +1,9 @@
 run-airflow:
 	mkdir -p postgres_data && docker compose up
 
+clear-airflow:
+	docker compose down -v
+
 run-backend:
 	PYTHONPATH=. poetry run uvicorn src.main:app --reload --port 8000
 
