@@ -41,7 +41,7 @@ my_dag = DAG(
     dag_id="production_pipeline",
     start_date=datetime.datetime(2025, 2, 14),
     # https://airflow.apache.org/docs/apache-airflow/stable/authoring-and-scheduling/cron.html
-    schedule=datetime.timedelta(seconds=60)
+    schedule=datetime.timedelta(seconds=60),
 )
 
 build_prod_dag(my_dag)
