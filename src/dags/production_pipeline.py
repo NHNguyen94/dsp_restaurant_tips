@@ -2,10 +2,17 @@ import datetime
 
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import PythonOperator
+
+from src.services.data_pipelines import ingest_data
 
 
 def build_ingest(dag: DAG):
-    return EmptyOperator(task_id="read_data", dag=dag)
+    return PythonOperator(
+        task_id="ingest_data",
+        python_callable=ingest_data,
+        dag=dag,
+    )
 
 
 def build_validate(dag: DAG):

@@ -1,0 +1,1 @@
+from src.services.data_pipelines.ingestion import ingest_data
