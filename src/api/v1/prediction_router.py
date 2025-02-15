@@ -3,7 +3,7 @@ from typing import List, Annotated
 from fastapi import APIRouter, UploadFile, File, Depends
 
 from src.api.v1.models import PredictionRequest, PredictionResponse
-from src.ml_pipelines.inference import async_predict_response_with_features
+from src.services.ml_pipelines.inference import async_predict_response_with_features
 from src.utils.api_request_parser import ApiRequestParser
 from src.utils.validation_manager import ValidationManager
 
