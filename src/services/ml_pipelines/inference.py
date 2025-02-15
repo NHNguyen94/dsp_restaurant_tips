@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from xgboost import Booster, DMatrix
 
-from src.ml_pipelines.pre_processing import process_data
+from src.services.ml_pipelines.pre_processing import process_data
 from src.utils.configs_manager import ModelPathConfigs, ModelConfigs
 from src.utils.helper import round_number
 

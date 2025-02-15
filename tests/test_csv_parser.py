@@ -23,3 +23,16 @@ class TestCsvParser:
                 "size",
             ]
             assert df.shape == (3, 7)
+
+    def test_read_csv_from_file_path(self):
+        df = self.paser.read_csv_from_file_path(self.test_csv_path)
+        assert df.columns.tolist() == [
+            "total_bill",
+            "tip",
+            "sex",
+            "smoker",
+            "day",
+            "time",
+            "size",
+        ]
+        assert df.shape == (3, 7)

@@ -1,17 +1,56 @@
+<<<<<<< HEAD
+version: '3.7'
+
 services:
-  db:
-    image: postgres
-    restart: always
+  postgres:
+    image: postgres:13
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_USER: admin_user
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_DB: postgres_db
     volumes:
-      - pgdata:/var/lib/postgresql/data 
- 
-  adminer:
-    image: adminer
-    restart: always
+      - ./postgres_data:/var/lib/postgresql/data
     ports:
-      - 8080:8080
- 
-volumes:
-  pgdata:
+      - "5432:5432"
+
+  webserver:
+    image: apache/airflow:2.6.3
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin_user:admin_password@postgres/postgres_db
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - .:/opt/airflow
+    entrypoint: >
+      /bin/bash -c "
+      airflow db init &&
+      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com &&
+      exec airflow webserver
+      "
+
+  scheduler:
+    image: apache/airflow:2.6.3
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin_user:admin_password@postgres/postgres_db
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    depends_on:
+      - postgres
+    volumes:
+      - ./src/dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - .:/opt/airflow
+    entrypoint: >
+      /bin/bash -c "
+      exec airflow scheduler
+      "
