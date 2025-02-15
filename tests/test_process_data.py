@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.ml_pipelines.pre_processing import process_data
+from src.services.ml_pipelines import process_data
 
 
 class TestProcessData:

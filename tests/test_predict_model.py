@@ -1,11 +1,11 @@
 import pandas as pd
 import pytest
 
-from src.ml_pipelines.inference import (
+from src.services.ml_pipelines import (
     async_predict,
     async_predict_response_with_features,
 )
-from src.ml_pipelines.pre_processing import process_data
+from src.services.ml_pipelines import process_data
 from src.utils.configs_manager import ModelPathConfigs, ModelConfigs
 
 model_path_configs = ModelPathConfigs.get_configs()
