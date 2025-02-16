@@ -12,7 +12,7 @@ class ApiRequestParser:
         self.csv_parser = CSVParser()
 
     def _get_fields(self) -> List[str]:
-        return list(PredictionRequest.model_fields.keys())
+        return list(PredictionRequest.__fields__.keys())
 
     def _limit_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         return df[self._get_fields()]
@@ -27,7 +27,7 @@ class ApiRequestParser:
             raise HTTPException(status_code=400, detail=f"Invalid CSV file: {e}")
 
     def parse_request_to_df(self, request: PredictionRequest) -> pd.DataFrame:
-        df = pd.DataFrame([request.model_dump()])
+        df = pd.DataFrame([request.dict()])
         return self._limit_columns(df)
 
     async def parse_csv_to_df(self, input_csv: UploadFile) -> pd.DataFrame:
