@@ -3488,6 +3488,23 @@ docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
 tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
+name = "pymsteams"
+version = "0.2.5"
+description = "Format messages and post to Microsoft Teams."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pymsteams-0.2.5-py3-none-any.whl", hash = "sha256:bda78f36c4a59baa10fa21928980349a841b03c78dc7d6020f230aea4aeab2b7"},
+    {file = "pymsteams-0.2.5.tar.gz", hash = "sha256:9f76ca3a3de17b49ce3c5c314ee0e88b8bd2be78fc66f693ade1b7cabf23af70"},
+]
+
+[package.dependencies]
+requests = ">=2.20.0"
+
+[package.extras]
+async = ["httpx (>=0.28.1)"]
+
+[[package]]
 name = "pyparsing"
 version = "3.2.1"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -5077,4 +5094,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "976bdb9b9c544557cd73963aa61740f4df2bccda9b15553bb84b61810613ee50"
+content-hash = "afeb443b9087694e4ab07715ac9107e9cf79dd8ae32a02b8bea77aefc1bf7e38"
