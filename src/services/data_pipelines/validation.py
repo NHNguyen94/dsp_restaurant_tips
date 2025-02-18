@@ -1,3 +1,6 @@
+from src.services.data_pipelines.models.bad_data import Anomaly
+
+
 def _compute_anomaly(self, df: pd.DataFrame) -> Anomaly:
     return Anomaly(
         total_null=df.isnull().sum().sum(),
