@@ -1,3 +1,5 @@
+from src.utils.directory_manager import DirectoryManager
+
 def _copy_good_data(self, file_path: str) -> None:
     file_name = file_path.split("/")[-1]
     DirectoryManager.move_file(
