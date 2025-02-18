@@ -1,5 +1,10 @@
 import datetime
 
+import os
+import sys
+
+project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, project_dir)
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
@@ -27,8 +32,12 @@ def build_save_file(dag: DAG):
     return EmptyOperator(task_id="save_file", dag=dag)
 
 
-def save_statistics(dag: DAG):
+def build_save_statistics(dag: DAG):
     return EmptyOperator(task_id="save_statistics", dag=dag)
+
+
+def build_clear_cache(dag: DAG):
+    return EmptyOperator(task_id="clear_cache", dag=dag)
 
 
 def build_prod_dag(dag: DAG):
@@ -36,12 +45,16 @@ def build_prod_dag(dag: DAG):
     validate = build_validate(dag)
     alert = build_alert(dag)
     save_file = build_save_file(dag)
-    stats = save_statistics(dag)
+    stats = build_save_statistics(dag)
+    clear_cache = build_clear_cache(dag)
 
     ingest >> validate
     validate >> alert
     validate >> save_file
     validate >> stats
+    alert >> clear_cache
+    save_file >> clear_cache
+    stats >> clear_cache
 
 
 my_dag = DAG(
