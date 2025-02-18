@@ -1,11 +1,17 @@
-run-docker:
+run-db:
 	mkdir -p postgres_data && docker compose up
 
-clear-docker:
-	docker compose down -v
+clear-db:
+	docker compose down -v && rm -rf postgres_data
 
-migrate-db:
-	PYTHONPATH=. alembic upgrade head
+init-airflow:
+	export AIRFLOW_HOME=. && airflow db init
+
+create-admin-airflow:
+	airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
+
+run-airflow:
+	airflow webserver --port 8080 && airflow scheduler
 
 run-backend:
 	PYTHONPATH=. poetry run uvicorn src.main:app --reload --port 8000
