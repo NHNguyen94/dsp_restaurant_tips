@@ -13,6 +13,9 @@ create-admin-airflow:
 run-airflow:
 	airflow webserver --port 8080 && airflow scheduler
 
+migrate-db:
+	alembic upgrade head
+
 run-backend:
 	PYTHONPATH=. poetry run uvicorn src.main:app --reload --port 8000
 
