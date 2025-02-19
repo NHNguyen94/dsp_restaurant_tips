@@ -182,3 +182,7 @@ cython_debug/
 /src/data_ml_models/feature_engineering/
 /postgres_data/
 /logs/
+airflow.db
+airflow-webserver.pid
+airflow-scheduler.pid
+airflow.cfg
