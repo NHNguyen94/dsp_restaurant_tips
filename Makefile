@@ -1,5 +1,5 @@
 run-db:
-	mkdir -p postgres_data && docker compose up
+	sudo mkdir -p postgres_data && sudo docker compose up
 
 clear-db:
 	docker compose down -v && rm -rf postgres_data
