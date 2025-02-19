@@ -1,67 +1,52 @@
 import datetime
-
 import os
 import sys
 
+import pandas as pd
+from airflow.decorators import dag, task
+
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, project_dir)
-from airflow import DAG
-from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import PythonOperator
 
-from src.services.data_pipelines import ingest_data
+from src.services.data_pipelines import (ingest_data, validate_data)
+from airflow.utils.dates import days_ago
 
 
-def build_ingest(dag: DAG):
-    return PythonOperator(
-        task_id="ingest_data",
-        python_callable=ingest_data,
-        dag=dag,
-    )
-
-
-def build_validate(dag: DAG):
-    return EmptyOperator(task_id="validate_data", dag=dag)
-
-
-def build_alert(dag: DAG):
-    return EmptyOperator(task_id="send_alert", dag=dag)
-
-
-def build_save_file(dag: DAG):
-    return EmptyOperator(task_id="save_file", dag=dag)
-
-
-def build_save_statistics(dag: DAG):
-    return EmptyOperator(task_id="save_statistics", dag=dag)
-
-
-def build_clear_cache(dag: DAG):
-    return EmptyOperator(task_id="clear_cache", dag=dag)
-
-
-def build_prod_dag(dag: DAG):
-    ingest = build_ingest(dag)
-    validate = build_validate(dag)
-    alert = build_alert(dag)
-    save_file = build_save_file(dag)
-    stats = build_save_statistics(dag)
-    clear_cache = build_clear_cache(dag)
-
-    ingest >> validate
-    validate >> alert
-    validate >> save_file
-    validate >> stats
-    alert >> clear_cache
-    save_file >> clear_cache
-    stats >> clear_cache
-
-
-my_dag = DAG(
+@dag(
     dag_id="ingestion_pipeline",
-    start_date=datetime.datetime(2025, 2, 14),
-    # https://airflow.apache.org/docs/apache-airflow/stable/authoring-and-scheduling/cron.html
-    schedule=datetime.timedelta(seconds=60),
+    description="Ingestion pipeline",
+    tags=["ingestion"],
+    schedule_interval=datetime.timedelta(seconds=60),
+    start_date=days_ago(n=0, hour=1),
+    max_active_runs=1,
+    catchup=False
 )
+def ingestion_pipeline():
+    @task
+    def ingest() -> str:
+        return ingest_data()
 
-build_prod_dag(my_dag)
+    @task
+    def validate(file_path: str) -> pd.DataFrame:
+        return validate_data(file_path)
+
+    @task
+    def alert(df: pd.DataFrame) -> None:
+        pass
+
+    @task
+    def save_file(df: pd.DataFrame) -> None:
+        pass
+
+    @task
+    def save_statistics(bad_data: pd.DataFrame) -> None:
+        pass
+
+    ingested_file = ingest()
+    df = validate(file_path=ingested_file)
+    alert(df)
+    save_file(df)
+    save_statistics(df)
+
+
+ingestion_pipeline()
