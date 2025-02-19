@@ -54,26 +54,13 @@ class ModelPathConfigs(PathConfigs):
 class ModelConfigs:
     TIP = "tip"
 
+
 class DataConfigs:
     EXPECTED_RESULTS_FOR_VALIDATION = {
-        "total_bill": {
-            "min": 0,
-            "max": 1000000
-        },
-        "size": {
-            "min": 0,
-            "max": 50
-        },
-        "sex": {
-            "accept": ("Male", "Female")
-        },
-        "smoker": {
-            "accept": ("Yes", "No")
-        },
-        "day": {
-            "accept": ("Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun")
-        },
-        "time": {
-            "accept": ("Lunch", "Dinner")
-        },
+        "total_bill": {"min": 0, "max": 1000000},
+        "size": {"min": 0, "max": 50},
+        "sex": {"accept": ("Male", "Female")},
+        "smoker": {"accept": ("Yes", "No")},
+        "day": {"accept": ("Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun")},
+        "time": {"accept": ("Lunch", "Dinner")},
     }
