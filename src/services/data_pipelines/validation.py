@@ -10,6 +10,6 @@ def _validate(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def validate_data(file_path: str) -> pd.DataFrame:
+def run_validate_data(file_path: str) -> pd.DataFrame:
     df = parser.read_csv_from_file_path(file_path)
     return _validate(df)

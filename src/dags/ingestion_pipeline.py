@@ -8,7 +8,11 @@ from airflow.decorators import dag, task
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, project_dir)
 
-from src.services.data_pipelines import (ingest_data, validate_data)
+from src.services.data_pipelines import (
+    run_ingest_data,
+    run_validate_data,
+    run_save_file,
+)
 
 from airflow.utils.dates import days_ago
 
@@ -25,29 +29,29 @@ from airflow.utils.dates import days_ago
 def ingestion_pipeline():
     @task
     def ingest() -> str:
-        return ingest_data()
+        return run_ingest_data()
 
     @task
-    def validate(file_path: str) -> pd.DataFrame:
-        return validate_data(file_path)
+    def build_validate(file_path: str) -> pd.DataFrame:
+        return run_validate_data(file_path)
 
     @task
-    def alert(df: pd.DataFrame) -> None:
+    def build_alert(df: pd.DataFrame) -> None:
         pass
 
     @task
-    def save_file(df: pd.DataFrame) -> None:
-        pass
+    def build_save_file(df: pd.DataFrame) -> None:
+        run_save_file(df)
 
     @task
-    def save_statistics(bad_data: pd.DataFrame) -> None:
+    def build_save_statistics(bad_data: pd.DataFrame) -> None:
         pass
 
     ingested_file = ingest()
-    df = validate(file_path=ingested_file)
-    alert(df)
-    save_file(df)
-    save_statistics(df)
+    df = build_validate(file_path=ingested_file)
+    build_alert(df)
+    build_save_file(df)
+    build_save_statistics(df)
 
 
 ingestion_pipeline()
