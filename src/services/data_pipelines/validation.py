@@ -16,6 +16,7 @@ from great_expectations.datasource.fluent.interfaces import Batch
 from great_expectations.execution_engine import PandasExecutionEngine
 from great_expectations.validator.validator import Validator
 
+from services.data_pipelines.models.validated_result import ValidatedResult
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
 from src.utils.date_time_manager import DateTimeManager
@@ -59,19 +60,28 @@ class ValidationService:
         docs_urls = [url["site_url"] for url in docs_urls]
         return docs_urls
 
-    # def _parse_results_from_validator(self, results: List[Dict]) -> Dict:
-    #     cols_results = {}
-    #     for result in results:
-    #         column = result["expectation_config"]["kwargs"]["column"]
-    #         res_per_col =
-    #     return cols_results
+    def _parse_results_from_validator(
+        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+    ) -> (List, bool):
+        parsed_results = []
+        overall_result = results["success"]
+        results = results["results"]
+        for result in results:
+            details = {
+                "success": result["success"],
+                "column": result["expectation_config"]["kwargs"]["column"],
+                "result": result["result"],
+            }
+            parsed_results.append(details)
+        return (parsed_results, overall_result)
 
-    def validate_columns_with_validator(self) -> (List, List):
+    def validate_columns_with_validator(
+        self,
+    ) -> ExpectationValidationResult | ExpectationSuiteValidationResult:
         validator = self._get_gx_validator()
         suite_name = "validation_suite"
         validator.expectation_suite_name = suite_name
         suite = self.context.suites.add(ExpectationSuite(suite_name))
-        cols_results = {}
         for k, v in self.expected_data.items():
             if "min" in v and "max" in v:
                 expectation = gx.expectations.ExpectColumnValuesToBeBetween(
@@ -84,11 +94,7 @@ class ValidationService:
                 )
                 suite.add_expectation(expectation)
 
-        results = validator.validate(suite)
-
-        docs_urls = self._build_datadocs_urls(results)
-
-        return (results["results"], docs_urls)
+        return validator.validate(suite)
 
     def validate_columns(self) -> Dict:
         batch = self._get_gx_batch()
@@ -121,22 +127,53 @@ class ValidationService:
         unique_failed_indicies = set(unique_failed_indicies)
         return list(unique_failed_indicies)
 
-    def add_is_good_column(self) -> pd.DataFrame:
-        failed_indices = self.get_failed_indices(self.validate_columns())
+    # def add_is_good_column(self) -> pd.DataFrame:
+    #     failed_indices = self.get_failed_indices(self.validate_columns())
+    #     new_df = self.df.copy()
+    #     if len(failed_indices) > 0:
+    #         new_df["is_good"] = 1
+    #         new_df.loc[failed_indices, "is_good"] = 0
+    #     else:
+    #         new_df["is_good"] = 1
+    #
+    #     return new_df
+
+    def _create_filter_conditions(self, parsed_results: List) -> List:
+        filter_conditions = []
+        for res in parsed_results:
+            if res["success"] == False:
+                filter = {
+                    "column": res["column"],
+                    "values_to_remove": res["result"]["partial_unexpected_list"],
+                }
+                filter_conditions.append(filter)
+
+        return filter_conditions
+
+    def _make_df_with_is_good_col(self, parsed_results: List) -> pd.DataFrame:
         new_df = self.df.copy()
-        if len(failed_indices) > 0:
+        filter_conditions = self._create_filter_conditions(parsed_results)
+        if len(filter_conditions) > 0:
             new_df["is_good"] = 1
-            new_df.loc[failed_indices, "is_good"] = 0
+            for filter in filter_conditions:
+                new_df.loc[
+                    new_df[filter["column"]].isin(filter["values_to_remove"]), "is_good"
+                ] = 0
         else:
             new_df["is_good"] = 1
 
         return new_df
 
-    def validate_data(self) -> pd.DataFrame:
-        new_df = self.add_is_good_column()
-        return new_df
+    def validate_data(self) -> ValidatedResult:
+        validated_result = self.validate_columns_with_validator()
+        docs_urls = self._build_datadocs_urls(validated_result)
+        (parsed_results, overall_result) = self._parse_results_from_validator(
+            validated_result
+        )
+        final_df = self._make_df_with_is_good_col(parsed_results)
+        return ValidatedResult(parsed_results, overall_result, docs_urls, final_df)
 
 
-def run_validate_data(file_path: str, batch_definition: str) -> pd.DataFrame:
+def run_validate_data(file_path: str, batch_definition: str) -> ValidatedResult:
     validation_service = ValidationService(file_path, batch_definition)
     return validation_service.validate_data()
