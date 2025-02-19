@@ -19,6 +19,9 @@ run-scheduler:
 run-backend:
 	PYTHONPATH=. poetry run uvicorn src.main:app --reload --port 8000
 
+run-frontend:
+	streamlit run src/app/app.py
+
 pre-process-data:
 	PYTHONPATH=. poetry run python src/services/ml_pipelines/pre_processing.py
 
