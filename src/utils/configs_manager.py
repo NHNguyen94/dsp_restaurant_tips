@@ -19,12 +19,14 @@ class DataPathConfigs(PathConfigs):
     RAW_DATA_PATH = "src/data/raw_data"
     GOOD_DATA_PATH = "src/data/good_data"
     BAD_DATA_PATH = "src/data/bad_data"
+    DATA_VALIDATION_PATH = "src/data_validation_logs"
 
     @staticmethod
     def create_needed_directories():
         DirectoryManager.create_dir_if_not_exists("src/data/raw_data")
         DirectoryManager.create_dir_if_not_exists("src/data/good_data")
         DirectoryManager.create_dir_if_not_exists("src/data/bad_data")
+        DirectoryManager.create_dir_if_not_exists("src/data_validation_logs")
 
     @staticmethod
     def get_configs():

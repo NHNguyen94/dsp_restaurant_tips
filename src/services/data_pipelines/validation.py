@@ -2,14 +2,23 @@ from typing import Dict, List
 
 import great_expectations as gx
 import pandas as pd
-from great_expectations.core import ExpectationSuite
+from great_expectations import RunIdentifier
+from great_expectations.core import (
+    ExpectationSuite,
+    ExpectationValidationResult,
+    ExpectationSuiteValidationResult,
+)
+from great_expectations.data_context.types.resource_identifiers import (
+    ValidationResultIdentifier,
+    ExpectationSuiteIdentifier,
+)
 from great_expectations.datasource.fluent.interfaces import Batch
 from great_expectations.execution_engine import PandasExecutionEngine
 from great_expectations.validator.validator import Validator
-from great_expectations.datasource.fluent.pandas_datasource import PandasDatasource
 
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
+from src.utils.date_time_manager import DateTimeManager
 
 
 class ValidationService:
@@ -33,7 +42,31 @@ class ValidationService:
         batch = self._get_gx_batch()
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
-    def validate_columns_with_validator(self):
+    def _build_datadocs_urls(
+        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+    ) -> List:
+        suite_identifier = ExpectationSuiteIdentifier(
+            name=results.meta["expectation_suite_name"]
+        )
+        validation_result_identifier = ValidationResultIdentifier(
+            expectation_suite_identifier=suite_identifier,
+            run_id=RunIdentifier(),
+            batch_identifier=str(DateTimeManager.get_current_local_time()),
+        )
+        self.context.validation_results_store.set(validation_result_identifier, results)
+        self.context.build_data_docs()
+        docs_urls = self.context.get_docs_sites_urls()
+        docs_urls = [url["site_url"] for url in docs_urls]
+        return docs_urls
+
+    # def _parse_results_from_validator(self, results: List[Dict]) -> Dict:
+    #     cols_results = {}
+    #     for result in results:
+    #         column = result["expectation_config"]["kwargs"]["column"]
+    #         res_per_col =
+    #     return cols_results
+
+    def validate_columns_with_validator(self) -> (List, List):
         validator = self._get_gx_validator()
         suite_name = "validation_suite"
         validator.expectation_suite_name = suite_name
@@ -51,13 +84,11 @@ class ValidationService:
                 )
                 suite.add_expectation(expectation)
 
-        # Save and build Datadocs
-        # validator.save_expectation_suite(discard_failed_expectations=False)
-        self.context.build_data_docs()
-        self.context.open_data_docs()
-
         results = validator.validate(suite)
-        return results
+
+        docs_urls = self._build_datadocs_urls(results)
+
+        return (results["results"], docs_urls)
 
     def validate_columns(self) -> Dict:
         batch = self._get_gx_batch()
@@ -75,15 +106,6 @@ class ValidationService:
                 )
                 result = batch.validate(expectation)
                 cols_results[k] = result
-
-        # Build datadocs
-        # print("Checking if the site names are available")
-        # print(self.context.get_site_names())
-        # print(self.context.get_docs_sites_urls())
-        #
-        # self.context.build_data_docs()
-        # self.context.open_data_docs()
-
 
         return cols_results
 
