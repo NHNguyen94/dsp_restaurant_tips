@@ -1,7 +1,7 @@
 import pandas as pd
 
-from src.utils.directory_manager import DirectoryManager
 from src.utils.configs_manager import DataPathConfigs
+from src.utils.directory_manager import DirectoryManager
 from src.utils.helper import get_unique_id
 
 data_path_configs = DataPathConfigs()
@@ -18,8 +18,9 @@ def _split_good_and_bad(df: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
     return (good_df, bad_df)
 
 
-def run_save_file(df: pd.DataFrame) -> None:
+def run_save_file(df: pd.DataFrame, file_path: str) -> None:
+    file_name = file_path.split("/")[-1]
+    file_name = file_name + "_" + get_unique_id()
     (good_df, bad_df) = _split_good_and_bad(df)
-    file_name = get_unique_id()
     _save_file(data_path_configs.GOOD_DATA_PATH + "/" + file_name, good_df)
     _save_file(data_path_configs.BAD_DATA_PATH + "/" + file_name, bad_df)

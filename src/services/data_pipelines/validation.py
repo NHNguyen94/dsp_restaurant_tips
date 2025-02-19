@@ -2,7 +2,11 @@ from typing import Dict, List
 
 import great_expectations as gx
 import pandas as pd
+from great_expectations.core import ExpectationSuite
 from great_expectations.datasource.fluent.interfaces import Batch
+from great_expectations.execution_engine import PandasExecutionEngine
+from great_expectations.validator.validator import Validator
+from great_expectations.datasource.fluent.pandas_datasource import PandasDatasource
 
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
@@ -14,15 +18,46 @@ class ValidationService:
         self.parser = CSVParser()
         self.df = self.parser.read_csv_from_file_path(file_path)
         self.expected_data = DataConfigs.EXPECTED_RESULTS_FOR_VALIDATION
+        self.context = gx.get_context()
 
     def _get_gx_batch(self) -> Batch:
-        context = gx.get_context()
-        data_source = context.data_sources.add_pandas(name="data")
+        data_source = self.context.data_sources.add_pandas(name="data")
         data_asset = data_source.add_dataframe_asset(name="pd DF asset")
         batch_def = data_asset.add_batch_definition_whole_dataframe(
             self.batch_definition
         )
         return batch_def.get_batch(batch_parameters={"dataframe": self.df})
+
+    # https://github.com/great-expectations/great_expectations/blob/develop/tests/validator/test_validator.py
+    def _get_gx_validator(self) -> Validator:
+        batch = self._get_gx_batch()
+        return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
+
+    def validate_columns_with_validator(self):
+        validator = self._get_gx_validator()
+        suite_name = "validation_suite"
+        validator.expectation_suite_name = suite_name
+        suite = self.context.suites.add(ExpectationSuite(suite_name))
+        cols_results = {}
+        for k, v in self.expected_data.items():
+            if "min" in v and "max" in v:
+                expectation = gx.expectations.ExpectColumnValuesToBeBetween(
+                    column=k, min_value=v["min"], max_value=v["max"]
+                )
+                suite.add_expectation(expectation)
+            if "accept" in v:
+                expectation = gx.expectations.ExpectColumnValuesToBeInSet(
+                    column=k, value_set=v["accept"]
+                )
+                suite.add_expectation(expectation)
+
+        # Save and build Datadocs
+        # validator.save_expectation_suite(discard_failed_expectations=False)
+        self.context.build_data_docs()
+        self.context.open_data_docs()
+
+        results = validator.validate(suite)
+        return results
 
     def validate_columns(self) -> Dict:
         batch = self._get_gx_batch()
@@ -40,6 +75,16 @@ class ValidationService:
                 )
                 result = batch.validate(expectation)
                 cols_results[k] = result
+
+        # Build datadocs
+        # print("Checking if the site names are available")
+        # print(self.context.get_site_names())
+        # print(self.context.get_docs_sites_urls())
+        #
+        # self.context.build_data_docs()
+        # self.context.open_data_docs()
+
+
         return cols_results
 
     def get_failed_indices(self, cols_results: Dict) -> List[int]:

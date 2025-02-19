@@ -40,17 +40,17 @@ def ingestion_pipeline():
         pass
 
     @task
-    def build_save_file(df: pd.DataFrame) -> None:
-        run_save_file(df)
+    def build_save_file(df: pd.DataFrame, file_path: str) -> None:
+        run_save_file(df, file_path)
 
     @task
     def build_save_statistics(bad_data: pd.DataFrame) -> None:
         pass
 
     ingested_file = ingest()
-    df = build_validate(file_path=ingested_file)
+    df = build_validate(ingested_file)
     build_alert(df)
-    build_save_file(df)
+    build_save_file(df, ingested_file)
     build_save_statistics(df)
 
 
