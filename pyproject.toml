@@ -25,7 +25,6 @@ scikit-learn = "^1.6.1"
 sqlmodel = "0.0.11"
 psycopg2-binary = "^2.9.10"
 pymsteams = "^0.2.5"
-alembic = "^1.14.1"
 
 
 [build-system]
