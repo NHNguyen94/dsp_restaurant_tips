@@ -16,7 +16,7 @@ from great_expectations.datasource.fluent.interfaces import Batch
 from great_expectations.execution_engine import PandasExecutionEngine
 from great_expectations.validator.validator import Validator
 
-from services.data_pipelines.models.validated_result import ValidatedResult
+from src.services.data_pipelines.models.validated_result import ValidatedResult
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
 from src.utils.date_time_manager import DateTimeManager
@@ -44,7 +44,7 @@ class ValidationService:
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     def _build_datadocs_urls(
-        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+            self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
     ) -> List:
         suite_identifier = ExpectationSuiteIdentifier(
             name=results.meta["expectation_suite_name"]
@@ -61,7 +61,7 @@ class ValidationService:
         return docs_urls
 
     def _parse_results_from_validator(
-        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+            self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
     ) -> (List, bool):
         parsed_results = []
         overall_result = results["success"]
@@ -76,7 +76,7 @@ class ValidationService:
         return (parsed_results, overall_result)
 
     def validate_columns_with_validator(
-        self,
+            self,
     ) -> ExpectationValidationResult | ExpectationSuiteValidationResult:
         validator = self._get_gx_validator()
         suite_name = "validation_suite"
