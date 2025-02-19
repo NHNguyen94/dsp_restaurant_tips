@@ -5,16 +5,16 @@ clear-db:
 	docker compose down -v && rm -rf postgres_data
 
 init-airflow:
-	export AIRFLOW_HOME=. && airflow db init
+	 airflow db init
 
 create-admin-airflow:
 	airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
 
-run-airflow:
-	airflow webserver --port 8080 && airflow scheduler
+run-webserver:
+	airflow webserver --port 8080
 
-migrate-db:
-	alembic upgrade head
+run-scheduler:
+	airflow scheduler
 
 run-backend:
 	PYTHONPATH=. poetry run uvicorn src.main:app --reload --port 8000
