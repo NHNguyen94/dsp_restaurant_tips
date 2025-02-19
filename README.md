@@ -4,7 +4,7 @@ make init-airflow
 make create-admin-airflow
 copy content of example_cfg_for_airflow.cfg into airflow.cfg
 
-Note: Because the webserver and scheduler must be run in 2 seperated terminals, so we need to export AIRFLOW_HOME=$(pwd) in each terminal, otherwise, it will link to root
+Note: Because the webserver and scheduler must be run in 2 seperated terminals, so we need to export AIRFLOW_HOME to the pwd in each terminal, otherwise, it will link to root
 export AIRFLOW_HOME=$(pwd)
 make run-webserver
 

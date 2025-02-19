@@ -9,6 +9,7 @@ project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."
 sys.path.insert(0, project_dir)
 
 from src.services.data_pipelines import (ingest_data, validate_data)
+
 from airflow.utils.dates import days_ago
 
 
@@ -19,7 +20,7 @@ from airflow.utils.dates import days_ago
     schedule_interval=datetime.timedelta(seconds=60),
     start_date=days_ago(n=0, hour=1),
     max_active_runs=1,
-    catchup=False
+    catchup=False,
 )
 def ingestion_pipeline():
     @task
