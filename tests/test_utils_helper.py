@@ -1,5 +1,5 @@
 from src.utils.configs_manager import ModelPathConfigs
-from src.utils.helper import load_configs, round_number
+from src.utils.helper import load_configs, round_number, get_unique_id
 
 
 class TestUtilsHelper:
@@ -12,3 +12,8 @@ class TestUtilsHelper:
         number = 10.123456
         rounded_number = round_number(number)
         assert rounded_number == 10.12
+
+    def test_get_unique_id(self):
+        unique_id = get_unique_id()
+        assert unique_id is not None
+        assert len(unique_id) > 0
