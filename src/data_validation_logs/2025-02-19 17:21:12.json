@@ -1,9 +1,0 @@
-{
-  "expectations": [],
-  "id": null,
-  "meta": {
-    "great_expectations_version": "1.3.5"
-  },
-  "name": "validation_suite",
-  "notes": null
-}
