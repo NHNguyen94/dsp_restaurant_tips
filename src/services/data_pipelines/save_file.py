@@ -1,8 +1,8 @@
 import pandas as pd
 
 from src.utils.directory_manager import DirectoryManager
-from utils.configs_manager import DataPathConfigs
-from utils.helper import get_unique_id
+from src.utils.configs_manager import DataPathConfigs
+from src.utils.helper import get_unique_id
 
 data_path_configs = DataPathConfigs()
 dir_manager = DirectoryManager()

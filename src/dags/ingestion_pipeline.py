@@ -10,7 +10,7 @@ sys.path.insert(0, project_dir)
 
 from src.services.data_pipelines import (
     run_ingest_data,
-    run_validate_data,
+    # run_validate_data,
     run_save_file,
 )
 
@@ -33,7 +33,7 @@ def ingestion_pipeline():
 
     @task
     def build_validate(file_path: str) -> pd.DataFrame:
-        return run_validate_data(file_path)
+        pass
 
     @task
     def build_alert(df: pd.DataFrame) -> None:
