@@ -8,7 +8,8 @@ from airflow.decorators import dag, task
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, project_dir)
 
-from src.services.data_pipelines import ingest_data, validate_data
+from src.services.data_pipelines import (ingest_data, validate_data)
+
 from airflow.utils.dates import days_ago
 
 
