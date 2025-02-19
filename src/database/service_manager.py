@@ -15,16 +15,21 @@ class DatabaseServiceManager:
             session.commit()
 
     def append_data_issue(
-            self,
-            file_path: str,
-            row_missing: int,
-            rows_unknown_value: int,
-            rows_invalid_value: int,
-            rows_outlier: int,
-            features_missing: int,
-            label_missing: int) -> None:
+        self,
+        file_path: str,
+        row_missing: int,
+        rows_unknown_value: int,
+        rows_invalid_value: int,
+        rows_outlier: int,
+        features_missing: int,
+        label_missing: int,
+    ) -> None:
         with self.session() as session:
-            file_registration = session.query(FileRegistration).filter(FileRegistration.file_path == file_path).first()
+            file_registration = (
+                session.query(FileRegistration)
+                .filter(FileRegistration.file_path == file_path)
+                .first()
+            )
             session.add(
                 DataIssues(
                     file_id=file_registration.file_id,
@@ -33,7 +38,7 @@ class DatabaseServiceManager:
                     rows_invalid_value=rows_invalid_value,
                     rows_outlier=rows_outlier,
                     features_missing=features_missing,
-                    label_missing=label_missing
+                    label_missing=label_missing,
                 )
             )
             session.commit()
@@ -41,5 +46,7 @@ class DatabaseServiceManager:
     def get_file_registrations(self, file_ids: List[str]) -> List[FileRegistration]:
         # https://sqlmodel.tiangolo.com/tutorial/where/#type-annotations-and-errors
         with self.session() as session:
-            query = select(FileRegistration).where(col(FileRegistration.file_id).in_(file_ids))
+            query = select(FileRegistration).where(
+                col(FileRegistration.file_id).in_(file_ids)
+            )
             return session.exec(query).all()
