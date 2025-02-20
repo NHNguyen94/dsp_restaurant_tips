@@ -1,6 +1,6 @@
 import pandas as pd
 
-from services.data_pipelines.models.validated_result import ValidatedResult
+from src.services.data_pipelines.models.validated_result import ValidatedResult
 from src.utils.configs_manager import DataPathConfigs
 from src.utils.directory_manager import DirectoryManager
 from src.utils.helper import get_unique_id

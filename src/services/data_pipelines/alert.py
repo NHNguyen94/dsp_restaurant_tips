@@ -1,4 +1,4 @@
-from services.data_pipelines.models.validated_result import ValidatedResult
+from src.services.data_pipelines.models.validated_result import ValidatedResult
 from src.clients.ms_teams_client import MSTeamsClient
 
 ms_teams_client = MSTeamsClient()
