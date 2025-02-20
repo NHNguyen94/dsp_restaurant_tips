@@ -24,9 +24,10 @@ from src.utils.date_time_manager import DateTimeManager
 
 class ValidationService:
     def __init__(self, file_path: str, batch_definition: str):
+        self.file_path = file_path
         self.batch_definition = batch_definition
         self.parser = CSVParser()
-        self.df = self.parser.read_csv_from_file_path(file_path)
+        self.df = self.parser.read_csv_from_file_path(self.file_path)
         self.expected_data = DataConfigs.EXPECTED_RESULTS_FOR_VALIDATION
         self.context = gx.get_context()
 
@@ -44,7 +45,7 @@ class ValidationService:
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     def _build_datadocs_urls(
-            self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
     ) -> List:
         suite_identifier = ExpectationSuiteIdentifier(
             name=results.meta["expectation_suite_name"]
@@ -61,7 +62,7 @@ class ValidationService:
         return docs_urls
 
     def _parse_results_from_validator(
-            self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
     ) -> (List, bool):
         parsed_results = []
         overall_result = results["success"]
@@ -76,7 +77,7 @@ class ValidationService:
         return (parsed_results, overall_result)
 
     def validate_columns_with_validator(
-            self,
+        self,
     ) -> ExpectationValidationResult | ExpectationSuiteValidationResult:
         validator = self._get_gx_validator()
         suite_name = "validation_suite"
@@ -171,7 +172,9 @@ class ValidationService:
             validated_result
         )
         final_df = self._make_df_with_is_good_col(parsed_results)
-        return ValidatedResult(parsed_results, overall_result, docs_urls, final_df)
+        return ValidatedResult(
+            self.file_path, parsed_results, overall_result, docs_urls, final_df
+        )
 
 
 def run_validate_data(file_path: str, batch_definition: str) -> ValidatedResult:
