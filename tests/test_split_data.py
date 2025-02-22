@@ -1,4 +1,4 @@
-from src.services.data_pipelines.split_data import split_data
+from services.data_pipelines.ingest.split_data import split_data
 from src.utils.directory_manager import DirectoryManager
 import os
 
