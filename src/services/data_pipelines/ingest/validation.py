@@ -53,7 +53,7 @@ class ValidationService:
         validation_result_identifier = ValidationResultIdentifier(
             expectation_suite_identifier=suite_identifier,
             run_id=RunIdentifier(),
-            batch_identifier=str(DateTimeManager.get_current_local_time()),
+            batch_identifier=str(DateTimeManager.get_current_local_time_str()),
         )
         self.context.validation_results_store.set(validation_result_identifier, results)
         self.context.build_data_docs()
@@ -96,48 +96,6 @@ class ValidationService:
                 suite.add_expectation(expectation)
 
         return validator.validate(suite)
-
-    def validate_columns(self) -> Dict:
-        batch = self._get_gx_batch()
-        cols_results = {}
-        for k, v in self.expected_data.items():
-            if "min" in v and "max" in v:
-                expectation = gx.expectations.ExpectColumnValuesToBeBetween(
-                    column=k, min_value=v["min"], max_value=v["max"]
-                )
-                result = batch.validate(expectation)
-                cols_results[k] = result
-            if "accept" in v:
-                expectation = gx.expectations.ExpectColumnValuesToBeInSet(
-                    column=k, value_set=v["accept"]
-                )
-                result = batch.validate(expectation)
-                cols_results[k] = result
-
-        return cols_results
-
-    def get_failed_indices(self, cols_results: Dict) -> List[int]:
-        unique_failed_indicies = []
-        cols = self.expected_data.keys()
-        for col in cols:
-            if cols_results[col]["success"] == False:
-                failed_indices = cols_results[col]["result"][
-                    "partial_unexpected_index_list"
-                ]
-                unique_failed_indicies.extend(failed_indices)
-        unique_failed_indicies = set(unique_failed_indicies)
-        return list(unique_failed_indicies)
-
-    # def add_is_good_column(self) -> pd.DataFrame:
-    #     failed_indices = self.get_failed_indices(self.validate_columns())
-    #     new_df = self.df.copy()
-    #     if len(failed_indices) > 0:
-    #         new_df["is_good"] = 1
-    #         new_df.loc[failed_indices, "is_good"] = 0
-    #     else:
-    #         new_df["is_good"] = 1
-    #
-    #     return new_df
 
     def _create_filter_conditions(self, parsed_results: List) -> List:
         filter_conditions = []

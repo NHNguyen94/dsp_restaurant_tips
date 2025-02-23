@@ -18,6 +18,22 @@ def _load_model() -> Booster:
     return model
 
 
+def predict(df: pd.DataFrame) -> np.ndarray:
+    model = _load_model()
+    dmatrix = DMatrix(df)
+    predictions = model.predict(dmatrix)
+    predictions = np.array([round_number(pred) for pred in predictions])
+    return predictions
+
+
+def predict_response_with_features(df: pd.DataFrame) -> pd.DataFrame:
+    processed_df = process_data(df)
+    predictions = predict(processed_df)
+    new_df = df.copy()
+    new_df[model_configs.TIP] = predictions
+    return new_df
+
+
 async def async_predict(df: pd.DataFrame) -> np.ndarray:
     model = _load_model()
     dmatrix = DMatrix(df)

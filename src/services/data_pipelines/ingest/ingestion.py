@@ -12,5 +12,4 @@ def run_ingest_data() -> str:
     if len(files) == 0:
         raise AirflowSkipException("No files to ingest")
     file_to_ingest = files[np.random.randint(0, len(files))]
-    print(f"\nFile to ingest: {file_to_ingest}\n")
     return file_to_ingest

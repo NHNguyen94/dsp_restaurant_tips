@@ -24,5 +24,5 @@ def get_unique_id() -> str:
     return (
         str(uuid.uuid4())
         + "_"
-        + DateTimeManager.get_current_local_time().replace(" ", "_")
+        + DateTimeManager.get_current_local_time_str().replace(" ", "_")
     )
