@@ -1,5 +1,5 @@
 from src.services.data_pipelines.models.validated_result import ValidatedResult
-from services.data_pipelines.ingest.validation import ValidationService
+from src.services.data_pipelines.ingest.validation import ValidationService
 
 
 class TestValidationService:
