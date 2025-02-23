@@ -29,3 +29,9 @@ def prediction_pipeline():
     @task
     def make_prediction(file_paths: List[str]) -> None:
         asyncio.run(run_prediction(file_paths))
+
+    new_files = check_for_new_data()
+    make_prediction(new_files)
+
+
+prediction_pipeline()
