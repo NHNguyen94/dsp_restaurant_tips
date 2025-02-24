@@ -17,22 +17,22 @@ run-scheduler:
 	airflow scheduler
 
 run-backend:
-	PYTHONPATH=. poetry run uvicorn src.main:app --reload --port 8000
+	PYTHONPATH=. uvicorn src.main:app --reload --port 8000 --log-level debug
 
 run-frontend:
 	streamlit run src/app/app.py
 
 split-dataset:
-	PYTHONPATH=. poetry run python src/services/data_pipelines/split_data.py $(files)
+	PYTHONPATH=. poetry run python src/services/data_pipelines/split_data.py 25
 
 pre-process-data:
-	PYTHONPATH=. poetry run python src/services/ml_pipelines/pre_processing.py
+	PYTHONPATH=. python src/services/ml_pipelines/pre_processing.py
 
 train-model:
-	PYTHONPATH=. poetry run python src/services/ml_pipelines/training.py
+	PYTHONPATH=. python src/services/ml_pipelines/training.py
 
 unittest:
-	PYTHONPATH=. poetry run pytest -s tests/
+	PYTHONPATH=. pytest -s tests/
 
 format:
 	PYTHONPATH=. ruff format

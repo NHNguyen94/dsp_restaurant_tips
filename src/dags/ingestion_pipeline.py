@@ -9,7 +9,7 @@ from airflow.decorators import dag, task
 
 from src.services.data_pipelines.models.validated_result import ValidatedResult
 
-from src.services.data_pipelines import (
+from src.services.data_pipelines.ingest import (
     run_ingest_data,
     run_validate_data,
     run_save_file,

@@ -1,4 +1,5 @@
-from typing import Dict, List
+from pprint import pprint
+from typing import Dict, List, Union
 
 import great_expectations as gx
 import pandas as pd
@@ -45,7 +46,8 @@ class ValidationService:
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     def _build_datadocs_urls(
-        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+        self,
+        results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
     ) -> List:
         suite_identifier = ExpectationSuiteIdentifier(
             name=results.meta["expectation_suite_name"]
@@ -53,7 +55,7 @@ class ValidationService:
         validation_result_identifier = ValidationResultIdentifier(
             expectation_suite_identifier=suite_identifier,
             run_id=RunIdentifier(),
-            batch_identifier=str(DateTimeManager.get_current_local_time()),
+            batch_identifier=str(DateTimeManager.get_current_local_time_str()),
         )
         self.context.validation_results_store.set(validation_result_identifier, results)
         self.context.build_data_docs()
@@ -62,7 +64,8 @@ class ValidationService:
         return docs_urls
 
     def _parse_results_from_validator(
-        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+        self,
+        results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
     ) -> (List, bool):
         parsed_results = []
         overall_result = results["success"]
@@ -78,11 +81,12 @@ class ValidationService:
 
     def validate_columns_with_validator(
         self,
-    ) -> ExpectationValidationResult | ExpectationSuiteValidationResult:
+    ) -> Union[ExpectationValidationResult, ExpectationSuiteValidationResult]:
         validator = self._get_gx_validator()
         suite_name = "validation_suite"
         validator.expectation_suite_name = suite_name
         suite = self.context.suites.add(ExpectationSuite(suite_name))
+        # print(f"\n\n\nself.expected_data: {self.expected_data}\n\n\n")
         for k, v in self.expected_data.items():
             if "min" in v and "max" in v:
                 expectation = gx.expectations.ExpectColumnValuesToBeBetween(
@@ -90,54 +94,16 @@ class ValidationService:
                 )
                 suite.add_expectation(expectation)
             if "accept" in v:
+                # print(f'v_accept: {v["accept"]}, with type: {type(v["accept"])}')
                 expectation = gx.expectations.ExpectColumnValuesToBeInSet(
-                    column=k, value_set=v["accept"]
+                    column=k,
+                    value_set=list(
+                        v["accept"]
+                    ),  # For old version, tuple is not accepted, has to be set/list
                 )
                 suite.add_expectation(expectation)
 
         return validator.validate(suite)
-
-    def validate_columns(self) -> Dict:
-        batch = self._get_gx_batch()
-        cols_results = {}
-        for k, v in self.expected_data.items():
-            if "min" in v and "max" in v:
-                expectation = gx.expectations.ExpectColumnValuesToBeBetween(
-                    column=k, min_value=v["min"], max_value=v["max"]
-                )
-                result = batch.validate(expectation)
-                cols_results[k] = result
-            if "accept" in v:
-                expectation = gx.expectations.ExpectColumnValuesToBeInSet(
-                    column=k, value_set=v["accept"]
-                )
-                result = batch.validate(expectation)
-                cols_results[k] = result
-
-        return cols_results
-
-    def get_failed_indices(self, cols_results: Dict) -> List[int]:
-        unique_failed_indicies = []
-        cols = self.expected_data.keys()
-        for col in cols:
-            if cols_results[col]["success"] == False:
-                failed_indices = cols_results[col]["result"][
-                    "partial_unexpected_index_list"
-                ]
-                unique_failed_indicies.extend(failed_indices)
-        unique_failed_indicies = set(unique_failed_indicies)
-        return list(unique_failed_indicies)
-
-    # def add_is_good_column(self) -> pd.DataFrame:
-    #     failed_indices = self.get_failed_indices(self.validate_columns())
-    #     new_df = self.df.copy()
-    #     if len(failed_indices) > 0:
-    #         new_df["is_good"] = 1
-    #         new_df.loc[failed_indices, "is_good"] = 0
-    #     else:
-    #         new_df["is_good"] = 1
-    #
-    #     return new_df
 
     def _create_filter_conditions(self, parsed_results: List) -> List:
         filter_conditions = []
