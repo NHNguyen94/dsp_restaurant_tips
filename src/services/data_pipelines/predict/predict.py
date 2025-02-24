@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List
 
 from src.database.models import Predictions
@@ -24,7 +25,7 @@ def _parse_response(response: List[Dict], file_path: str) -> List[Predictions]:
 
 
 def run_predict_single_file(file_path: str) -> List[Predictions]:
-    response = api_controller.predict_with_file(file_path)
+    response = api_controller.predict_with_file_manual_request(file_path)
     return _parse_response(response, file_path)
 
 
@@ -38,4 +39,5 @@ def run_predict_single_file(file_path: str) -> List[Predictions]:
 def run_predictions(file_paths: List[str]) -> None:
     for file_path in file_paths:
         predictions = run_predict_single_file(file_path)
+        logging.warning(f"Predictions: {predictions} for file: {file_path}")
         db_service_manager.append_predictions(predictions)

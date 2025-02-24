@@ -7,7 +7,6 @@ project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."
 sys.path.insert(0, project_dir)
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
-
 from src.services.data_pipelines.predict import run_predictions, check_new_data
 
 
