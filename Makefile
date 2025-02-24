@@ -23,7 +23,7 @@ run-frontend:
 	streamlit run src/app/app.py
 
 split-dataset:
-	PYTHONPATH=. python src/services/data_pipelines/split_data.py 25
+	PYTHONPATH=. poetry run python src/services/data_pipelines/split_data.py 25
 
 pre-process-data:
 	PYTHONPATH=. python src/services/ml_pipelines/pre_processing.py
