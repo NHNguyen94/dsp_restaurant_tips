@@ -1,4 +1,3 @@
-import asyncio
 from typing import Dict, List
 
 from src.database.models import Predictions
@@ -11,16 +10,32 @@ db_service_manager = DatabaseServiceManager()
 api_response_parser = ApiResponseParser()
 
 
-async def _predict(file_path: List[str]) -> List[Dict]:
-    tasks = [api_controller.async_predict_with_file(file) for file in file_path]
-    return await asyncio.gather(*tasks)
+#
+# async def _async_predict(file_path: List[str]) -> List[Dict]:
+#     tasks = [api_controller.async_predict_with_file(file) for file in file_path]
+#     return await asyncio.gather(*tasks)
 
 
-def _parse_response(response: List[Dict]) -> List[Predictions]:
-    return api_response_parser.parse_response(response)
+def _parse_response(response: List[Dict], file_path: str) -> List[Predictions]:
+    api_response = api_response_parser.parse_response(response)
+    for res in api_response:
+        res.file_path = file_path
+    return api_response
 
 
-async def run_prediction(file_paths: List[str]) -> None:
-    response = await _predict(file_paths)
-    predictions = _parse_response(response)
-    await db_service_manager.async_append_predictions(predictions)
+def run_predict_single_file(file_path: str) -> List[Predictions]:
+    response = api_controller.predict_with_file(file_path)
+    return _parse_response(response, file_path)
+
+
+#
+# async def async_run_prediction(file_paths: List[str]) -> None:
+#     response = await _async_predict(file_paths)
+#     predictions = _parse_response(response)
+#     await db_service_manager.async_append_predictions(predictions)
+
+
+def run_predictions(file_paths: List[str]) -> None:
+    for file_path in file_paths:
+        predictions = run_predict_single_file(file_path)
+        db_service_manager.append_predictions(predictions)

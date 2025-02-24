@@ -1,13 +1,14 @@
 import datetime
-import logging
 import os
 import sys
+from typing import List
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, project_dir)
-import psycopg2
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
+
+from src.services.data_pipelines.predict import run_predictions, check_new_data
 
 
 @dag(
@@ -19,32 +20,17 @@ from airflow.utils.dates import days_ago
     max_active_runs=1,
     catchup=False,
 )
-def run_connect_db():
+def prediction_pipeline():
     @task
-    def connect_to_another_db():
-        try:
-            db_params = {
-                "host": "localhost",
-                "database": "postgres_db",
-                "user": "admin_user",
-                "password": "admin_password",
-            }
-            conn = psycopg2.connect(**db_params)
-            cursor = conn.cursor()
-            cursor.execute("SELECT 1;")
-            result = cursor.fetchone()
-            if result:
-                logging.warning("Successfully connected to the database!")
-                logging.warning(f"Query result: {result}")
-            else:
-                logging.warning("No result from the query.")
-            cursor.close()
-            conn.close()
+    def build_check_new_data() -> List[str]:
+        return check_new_data.run_check_new_data()
 
-        except Exception as e:
-            logging.warning(f"Error during connection setup or query execution: {e}")
+    @task
+    def build_predictions(new_files: List[str]) -> None:
+        run_predictions(new_files)
 
-    connect_to_another_db()
+    new_files = build_check_new_data()
+    build_predictions(new_files)
 
 
-run_connect_db()
+prediction_pipeline()
