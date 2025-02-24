@@ -37,7 +37,8 @@ def predict_response_with_features(df: pd.DataFrame) -> pd.DataFrame:
 async def async_predict(df: pd.DataFrame) -> np.ndarray:
     model = _load_model()
     dmatrix = DMatrix(df)
-    predictions = await asyncio.to_thread(model.predict, dmatrix)
+    loop = asyncio.get_running_loop()
+    predictions = await loop.run_in_executor(None, model.predict, dmatrix)
     predictions = np.array([round_number(pred) for pred in predictions])
     return predictions
 

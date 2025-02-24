@@ -35,15 +35,12 @@ class DatabaseServiceManager:
                 session.add(predicted_file)
             session.commit()
 
-    def get_recent_predicted_files(self, hours_ago: int) -> List[PredictedFiles]:
+    def get_predicted_files(self, hours_ago: int) -> List[PredictedFiles]:
         # https://sqlmodel.tiangolo.com/tutorial/where/#type-annotations-and-errors
-        current_time = DateTimeManager.get_current_local_time()
         with self.session as session:
-            query = select(PredictedFiles).where(
-                col(PredictedFiles.completed_at)
-                <= DateTimeManager.get_hours_ago(hours_ago),
-            )
-            return session.exec(query).all()
+            query = select(PredictedFiles)
+            # https://sqlmodel.tiangolo.com/tutorial/select/#sqlmodels-sessionexec
+            return session.execute(query).scalars().all()
 
     def add_completed_at_to_unpredicted_files(
         self, unpredicted_files: List[PredictedFiles]

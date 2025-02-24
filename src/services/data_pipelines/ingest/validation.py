@@ -1,4 +1,5 @@
-from typing import Dict, List
+from pprint import pprint
+from typing import Dict, List, Union
 
 import great_expectations as gx
 import pandas as pd
@@ -45,7 +46,8 @@ class ValidationService:
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     def _build_datadocs_urls(
-        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+        self,
+        results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
     ) -> List:
         suite_identifier = ExpectationSuiteIdentifier(
             name=results.meta["expectation_suite_name"]
@@ -62,7 +64,8 @@ class ValidationService:
         return docs_urls
 
     def _parse_results_from_validator(
-        self, results: ExpectationValidationResult | ExpectationSuiteValidationResult
+        self,
+        results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
     ) -> (List, bool):
         parsed_results = []
         overall_result = results["success"]
@@ -78,11 +81,12 @@ class ValidationService:
 
     def validate_columns_with_validator(
         self,
-    ) -> ExpectationValidationResult | ExpectationSuiteValidationResult:
+    ) -> Union[ExpectationValidationResult, ExpectationSuiteValidationResult]:
         validator = self._get_gx_validator()
         suite_name = "validation_suite"
         validator.expectation_suite_name = suite_name
         suite = self.context.suites.add(ExpectationSuite(suite_name))
+        # print(f"\n\n\nself.expected_data: {self.expected_data}\n\n\n")
         for k, v in self.expected_data.items():
             if "min" in v and "max" in v:
                 expectation = gx.expectations.ExpectColumnValuesToBeBetween(
@@ -90,8 +94,12 @@ class ValidationService:
                 )
                 suite.add_expectation(expectation)
             if "accept" in v:
+                # print(f'v_accept: {v["accept"]}, with type: {type(v["accept"])}')
                 expectation = gx.expectations.ExpectColumnValuesToBeInSet(
-                    column=k, value_set=v["accept"]
+                    column=k,
+                    value_set=list(
+                        v["accept"]
+                    ),  # For old version, tuple is not accepted, has to be set/list
                 )
                 suite.add_expectation(expectation)
 

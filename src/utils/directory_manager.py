@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Union
 
 
 class DirectoryManager:
@@ -39,7 +39,7 @@ class DirectoryManager:
         print(f"Directory {dir} deleted")
 
     @staticmethod
-    def get_file_path_in_dir(folder_path: str) -> List[str] | None:
+    def get_file_path_in_dir(folder_path: str) -> Union[List[str], None]:
         if DirectoryManager.check_if_dir_exists(folder_path):
             return [
                 os.path.join(folder_path, file)
