@@ -14,6 +14,7 @@ class TestDataPipelines:
 
     def test_run_check_new_data(self):
         new_files = run_check_new_data()
+        # It can fail if the AirflowException is raised, it's okay
         print(f"\nnew_files: {new_files}")
 
     def test_run_predict_single_file(self):
