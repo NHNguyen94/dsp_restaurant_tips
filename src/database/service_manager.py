@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlmodel import select, col
+from sqlmodel import select, col, func
 
 from src.database.models import Predictions
 from src.database.session_manager import SessionManager
@@ -36,3 +36,9 @@ class DatabaseServiceManager:
                 predicted_file.file_path for predicted_file in predicted_files
             ]
             return predicted_files
+
+    def get_predicted_results_by_date(self, date: str) -> List[Predictions]:
+        with self.session as session:
+            query = select(Predictions).where(func.date(Predictions.created_at) == date)
+            predictions = session.execute(query).all()
+            return predictions
