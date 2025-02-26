@@ -1,52 +1,44 @@
-from src.database.models import FileRegistration, DataIssues
-from src.database.session_manager import SessionManager
 from typing import List
-from sqlmodel import select, col
+
+from sqlmodel import select, col, func
+
+from src.database.models import Predictions
+from src.database.session_manager import SessionManager
 
 
 class DatabaseServiceManager:
     def __init__(self):
         self.session_manager = SessionManager()
-        self.session = self.session_manager.session
+        self.session = self.session_manager.session()
+        self.async_session = self.session_manager.async_session()
 
-    def append_file_registration(self, file_path: str) -> None:
-        with self.session() as session:
-            session.add(FileRegistration(file_path=file_path))
+    def append_predictions(self, predictions: List[Predictions]) -> None:
+        with self.session as session:
+            for prediction in predictions:
+                session.add(prediction)
             session.commit()
 
-    def append_data_issue(
-        self,
-        file_path: str,
-        row_missing: int,
-        rows_unknown_value: int,
-        rows_invalid_value: int,
-        rows_outlier: int,
-        features_missing: int,
-        label_missing: int,
-    ) -> None:
-        with self.session() as session:
-            file_registration = (
-                session.query(FileRegistration)
-                .filter(FileRegistration.file_path == file_path)
-                .first()
-            )
-            session.add(
-                DataIssues(
-                    file_id=file_registration.file_id,
-                    row_missing=row_missing,
-                    rows_unknown_value=rows_unknown_value,
-                    rows_invalid_value=rows_invalid_value,
-                    rows_outlier=rows_outlier,
-                    features_missing=features_missing,
-                    label_missing=label_missing,
-                )
-            )
-            session.commit()
+    async def async_append_predictions(self, predictions: List[Predictions]) -> None:
+        async with self.async_session as session:
+            for prediction in predictions:
+                session.add(prediction)
+            await session.commit()
 
-    def get_file_registrations(self, file_ids: List[str]) -> List[FileRegistration]:
+    def get_predicted_files(self, new_files: List[str]) -> List[str]:
         # https://sqlmodel.tiangolo.com/tutorial/where/#type-annotations-and-errors
-        with self.session() as session:
-            query = select(FileRegistration).where(
-                col(FileRegistration.file_id).in_(file_ids)
+        with self.session as session:
+            # https://sqlmodel.tiangolo.com/tutorial/select/#sqlmodels-sessionexec
+            query = select(Predictions.file_path).where(
+                col(Predictions.file_path).in_(new_files)
             )
-            return session.exec(query).all()
+            predicted_files = session.execute(query).all()
+            predicted_files = [
+                predicted_file.file_path for predicted_file in predicted_files
+            ]
+            return predicted_files
+
+    def get_predicted_results_by_date(self, date: str) -> List[Predictions]:
+        with self.session as session:
+            query = select(Predictions).where(func.date(Predictions.created_at) == date)
+            predictions = session.execute(query).all()
+            return predictions

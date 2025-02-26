@@ -2,6 +2,8 @@ import pandas as pd
 import pytest
 
 from src.services.ml_pipelines.inference import (
+    predict,
+    predict_response_with_features,
     async_predict,
     async_predict_response_with_features,
 )
@@ -13,6 +15,20 @@ model_configs = ModelConfigs()
 
 
 class TestPredictModel:
+    def test_predict_model(self):
+        df = pd.read_csv(model_path_configs.TEST_DATA_PATH)
+        df = df.drop(columns=[model_configs.TIP])
+        processed_df = process_data(df)
+        predictions = predict(processed_df)
+        assert len(predictions) == len(processed_df)
+
+    def test_predict_response_with_features(self):
+        df = pd.read_csv(model_path_configs.TEST_DATA_PATH)
+        df = df.drop(columns=[model_configs.TIP])
+        df_with_predictions = predict_response_with_features(df)
+        assert df_with_predictions[model_configs.TIP] is not None
+        assert len(df_with_predictions) == len(df)
+
     @pytest.mark.asyncio
     async def test_async_predict_model(self):
         df = pd.read_csv(model_path_configs.TEST_DATA_PATH)
@@ -26,6 +42,5 @@ class TestPredictModel:
         df = pd.read_csv(model_path_configs.TEST_DATA_PATH)
         df = df.drop(columns=[model_configs.TIP])
         df_with_predictions = await async_predict_response_with_features(df)
-        print(df_with_predictions)
         assert df_with_predictions[model_configs.TIP] is not None
         assert len(df_with_predictions) == len(df)
