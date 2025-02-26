@@ -11,6 +11,29 @@ services:
       - ./postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+# https://www.youtube.com/watch?v=-Ec5wzzV9lM&t=1s
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus_data:/etc/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: always
 #
 #  webserver:
 #    image: apache/airflow:2.6.3
