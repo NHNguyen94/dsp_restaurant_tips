@@ -12,7 +12,7 @@ make create-admin-airflow
 
 copy content of example_cfg_for_airflow.cfg into airflow.cfg
 
-Update sql_alchemy_conn in airflow.cfg to your db path
+Update sql_alchemy_conn in airflow.cfg to your db path (it's the absoluate path of airflow.db file under the project directory)
 
 # To run airflow:
 
@@ -34,7 +34,3 @@ lsof -i:8080
 lsof -i:8793
 
 kill -9 <PID>
-
-dags % airflow tasks run prediction_pipeline connect_to_another_db 2025-02-23
-
-dags % export AIRFLOW_CONFIG=/Users/nguyennguyen/Desktop/github_repos/personal/dsp_restaurant_tips/airflow.cfg
