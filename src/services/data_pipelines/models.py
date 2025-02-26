@@ -5,7 +5,15 @@ import pandas as pd
 
 
 @dataclass
-class ResultDetails:
+class OverallStatistics:
+    evaluated_expectations: int
+    successful_expectations: int
+    unsuccessful_expectations: int
+    success_percent: float
+
+
+@dataclass
+class GXResultBetweenOrInSetDetails:
     element_count: int
     unexpected_count: int
     unexpected_percent: float
@@ -17,16 +25,34 @@ class ResultDetails:
 
 
 @dataclass
-class DataPerColumn:
+class GXResultNotNullDetails:
+    element_count: int
+    unexpected_count: int
+    unexpected_percent: float
+    partial_unexpected_list: List
+
+
+@dataclass
+class GXResultPerColumn:
     success: bool
     column: str
-    result: ResultDetails
+    result_column_exist: bool
+    result_not_null: GXResultNotNullDetails
+    result_between_or_in_set: GXResultBetweenOrInSetDetails
+
+
+@dataclass
+class CSVResult:
+    bad_encoding: bool
+    bad_format: bool
 
 
 @dataclass
 class ValidatedResult:
     file_path: str
-    parsed_results: List[DataPerColumn]
     overall_result: bool
-    docs_urls: List
-    final_df: pd.DataFrame
+    overall_statistics: OverallStatistics
+    csv_results: CSVResult = None
+    parsed_results_gx: List[GXResultPerColumn] = None
+    docs_urls: List = None
+    final_df: pd.DataFrame = None

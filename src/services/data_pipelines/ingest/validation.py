@@ -18,8 +18,9 @@ from great_expectations.validator.validator import Validator
 
 from src.services.data_pipelines.models import (
     ValidatedResult,
-    DataPerColumn,
-    ResultDetails,
+    GXResultPerColumn,
+    GXResultBetweenOrInSetDetails,
+    OverallStatistics
 )
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
@@ -69,19 +70,20 @@ class ValidationService:
     def _parse_results_from_validator(
         self,
         results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
-    ) -> (List[DataPerColumn], bool):
+    ) -> (List[GXResultPerColumn], bool, OverallStatistics):
         parsed_results = []
         overall_result = results["success"]
         results = results["results"]
+        stats = results["statistics"]
         for result in results:
             data_per_col = {
                 "success": result["success"],
                 "column": result["expectation_config"]["kwargs"]["column"],
-                "result": ResultDetails(**result["result"]),
+                "result": GXResultBetweenOrInSetDetails(**result["result"]),
             }
-            data_per_col = DataPerColumn(**data_per_col)
+            data_per_col = GXResultPerColumn(**data_per_col)
             parsed_results.append(data_per_col)
-        return (parsed_results, overall_result)
+        return (parsed_results, overall_result, stats)
 
     def validate_columns_with_validator(
         self,
@@ -92,6 +94,10 @@ class ValidationService:
         suite = self.context.suites.add(ExpectationSuite(suite_name))
         # print(f"\n\n\nself.expected_data: {self.expected_data}\n\n\n")
         for k, v in self.expected_data.items():
+            expectation_col = gx.expectations.ExpectColumnToExist(column=k)
+            suite.add_expectation(expectation_col)
+            expectation_value = gx.expectations.ExpectColumnValuesToNotBeNull(column=k)
+            suite.add_expectation(expectation_value)
             if "min" in v and "max" in v:
                 expectation = gx.expectations.ExpectColumnValuesToBeBetween(
                     column=k, min_value=v["min"], max_value=v["max"]
@@ -109,20 +115,20 @@ class ValidationService:
 
         return validator.validate(suite)
 
-    def _create_filter_conditions(self, parsed_results: List[DataPerColumn]) -> List:
+    def _create_filter_conditions(self, parsed_results: List[GXResultPerColumn]) -> List:
         filter_conditions = []
         for res in parsed_results:
             if res.success == False:
                 filter = {
                     "column": res.column,
-                    "values_to_remove": res.result.partial_unexpected_list,
+                    "values_to_remove": res.result_between_or_in_set.partial_unexpected_list,
                 }
                 filter_conditions.append(filter)
 
         return filter_conditions
 
     def _make_df_with_is_good_col(
-        self, parsed_results: List[DataPerColumn]
+        self, parsed_results: List[GXResultPerColumn]
     ) -> pd.DataFrame:
         new_df = self.df.copy()
         filter_conditions = self._create_filter_conditions(parsed_results)
@@ -140,12 +146,17 @@ class ValidationService:
     def validate_data(self) -> ValidatedResult:
         validated_result = self.validate_columns_with_validator()
         docs_urls = self._build_datadocs_urls(validated_result)
-        (parsed_results, overall_result) = self._parse_results_from_validator(
+        (parsed_results, overall_result, stats) = self._parse_results_from_validator(
             validated_result
         )
         final_df = self._make_df_with_is_good_col(parsed_results)
         return ValidatedResult(
-            self.file_path, parsed_results, overall_result, docs_urls, final_df
+            file_path=self.file_path,
+            overall_result=overall_result,
+            overall_statistics=stats,
+            parsed_results_gx=parsed_results,
+            docs_urls=docs_urls,
+            final_df=final_df
         )
 
 
