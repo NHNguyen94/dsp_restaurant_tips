@@ -52,5 +52,4 @@ async def predict(
 @router.post("/past-predictions", response_model=List[PredictionResponse])
 async def past_predictions(date: str):
     predicted_results = db_service_manager.get_predicted_results_by_date(date)
-    print(f"predicted_results: {predicted_results[:3]}")
     return _parse_predictions_to_api_response(predicted_results)
