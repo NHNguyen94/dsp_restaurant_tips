@@ -7,13 +7,14 @@ sys.path.insert(0, project_dir)
 
 from airflow.decorators import dag, task
 
-from src.services.data_pipelines.models.validated_result import ValidatedResult
+from services.data_pipelines.models import ValidatedResult
 
 from src.services.data_pipelines.ingest import (
     run_ingest_data,
     run_validate_data,
     run_save_file,
     run_alert,
+    run_save_statistics,
 )
 
 from airflow.utils.dates import days_ago
@@ -47,7 +48,7 @@ def ingestion_pipeline():
 
     @task
     def build_save_statistics(validated_result: ValidatedResult) -> None:
-        pass
+        run_save_statistics(validated_result)
 
     ingested_file = ingest()
     validated_result = build_validate(ingested_file)

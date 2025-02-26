@@ -23,6 +23,7 @@ class Predictions(ProjectBaseModel, table=True):
     tip: float = Field(nullable=False)
     created_at: datetime = Field(nullable=False, index=True)
 
+
 class DataIssues(ProjectBaseModel, table=True):
     __tablename__ = "data_issues"
     id: UUID = Field(primary_key=True, default_factory=uuid4)

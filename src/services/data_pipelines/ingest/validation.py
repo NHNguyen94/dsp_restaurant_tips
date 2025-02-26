@@ -1,5 +1,4 @@
-from pprint import pprint
-from typing import Dict, List, Union
+from typing import List, Union
 
 import great_expectations as gx
 import pandas as pd
@@ -17,7 +16,11 @@ from great_expectations.datasource.fluent.interfaces import Batch
 from great_expectations.execution_engine import PandasExecutionEngine
 from great_expectations.validator.validator import Validator
 
-from src.services.data_pipelines.models.validated_result import ValidatedResult
+from src.services.data_pipelines.models import (
+    ValidatedResult,
+    DataPerColumn,
+    ResultDetails,
+)
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
 from src.utils.date_time_manager import DateTimeManager
@@ -66,17 +69,18 @@ class ValidationService:
     def _parse_results_from_validator(
         self,
         results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
-    ) -> (List, bool):
+    ) -> (List[DataPerColumn], bool):
         parsed_results = []
         overall_result = results["success"]
         results = results["results"]
         for result in results:
-            details = {
+            data_per_col = {
                 "success": result["success"],
                 "column": result["expectation_config"]["kwargs"]["column"],
-                "result": result["result"],
+                "result": ResultDetails(**result["result"]),
             }
-            parsed_results.append(details)
+            data_per_col = DataPerColumn(**data_per_col)
+            parsed_results.append(data_per_col)
         return (parsed_results, overall_result)
 
     def validate_columns_with_validator(
@@ -105,19 +109,21 @@ class ValidationService:
 
         return validator.validate(suite)
 
-    def _create_filter_conditions(self, parsed_results: List) -> List:
+    def _create_filter_conditions(self, parsed_results: List[DataPerColumn]) -> List:
         filter_conditions = []
         for res in parsed_results:
-            if res["success"] == False:
+            if res.success == False:
                 filter = {
-                    "column": res["column"],
-                    "values_to_remove": res["result"]["partial_unexpected_list"],
+                    "column": res.column,
+                    "values_to_remove": res.result.partial_unexpected_list,
                 }
                 filter_conditions.append(filter)
 
         return filter_conditions
 
-    def _make_df_with_is_good_col(self, parsed_results: List) -> pd.DataFrame:
+    def _make_df_with_is_good_col(
+        self, parsed_results: List[DataPerColumn]
+    ) -> pd.DataFrame:
         new_df = self.df.copy()
         filter_conditions = self._create_filter_conditions(parsed_results)
         if len(filter_conditions) > 0:
