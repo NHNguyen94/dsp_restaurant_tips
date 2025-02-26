@@ -19,8 +19,10 @@ from great_expectations.validator.validator import Validator
 from src.services.data_pipelines.models import (
     ValidatedResult,
     GXResultPerColumn,
+    GXResultNotNullDetails,
     GXResultBetweenOrInSetDetails,
-    OverallStatistics
+    OverallStatistics,
+    AllResults,
 )
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
@@ -69,21 +71,83 @@ class ValidationService:
 
     def _parse_results_from_validator(
         self,
-        results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
+        input_results: Union[
+            ExpectationValidationResult, ExpectationSuiteValidationResult
+        ],
     ) -> (List[GXResultPerColumn], bool, OverallStatistics):
         parsed_results = []
-        overall_result = results["success"]
-        results = results["results"]
-        stats = results["statistics"]
-        for result in results:
-            data_per_col = {
-                "success": result["success"],
-                "column": result["expectation_config"]["kwargs"]["column"],
-                "result": GXResultBetweenOrInSetDetails(**result["result"]),
-            }
-            data_per_col = GXResultPerColumn(**data_per_col)
+        overall_result = input_results["success"]
+        stats = input_results["statistics"]
+
+        results = input_results["results"]
+        for res in results:
+            expectation_config = res["expectation_config"]
+            data_per_col = GXResultPerColumn(
+                success=res["success"],
+                column=expectation_config["kwargs"]["column"],
+                all_results=AllResults(),
+            )
+
+            if expectation_config["type"] == "expect_column_to_exist":
+                data_per_col.all_results.result_column_exist = res["success"]
+            if expectation_config["type"] == "expect_column_values_to_not_be_null":
+                data_per_col.all_results.result_not_null = GXResultNotNullDetails(
+                    **res["result"]
+                )
+            if expectation_config["type"] in [
+                "expect_column_values_to_be_in_set",
+                "expect_column_values_to_be_between",
+            ]:
+                data_per_col.all_results.result_between_or_in_set = (
+                    GXResultBetweenOrInSetDetails(**res["result"])
+                )
+
             parsed_results.append(data_per_col)
+
         return (parsed_results, overall_result, stats)
+
+    def group_by_parsed_results_by_column(
+        self, parsed_results: List[GXResultPerColumn]
+    ) -> List[GXResultPerColumn]:
+        grouped_results = []
+        for col in self.expected_data.keys():
+            final_success_for_column = True
+            new_all_res = AllResults()
+            for res in parsed_results:
+                if res.column == col:
+                    if res.all_results.result_column_exist:
+                        new_all_res.result_column_exist = (
+                            res.all_results.result_column_exist
+                        )
+                        final_success_for_column = (
+                            final_success_for_column and res.success
+                        )
+                    if res.all_results.result_not_null:
+                        new_all_res.result_not_null = res.all_results.result_not_null
+                        final_success_for_column = (
+                            final_success_for_column and res.success
+                        )
+                    if res.all_results.result_between_or_in_set:
+                        new_all_res.result_between_or_in_set = (
+                            res.all_results.result_between_or_in_set
+                        )
+                        final_success_for_column = (
+                            final_success_for_column and res.success
+                        )
+            new_parsed_res = GXResultPerColumn(
+                success=final_success_for_column, column=col, all_results=new_all_res
+            )
+            grouped_results.append(new_parsed_res)
+
+        for data in grouped_results:
+            if (
+                data.all_results.result_column_exist is None
+                or data.all_results.result_not_null is None
+                or data.all_results.result_between_or_in_set is None
+            ):
+                raise ValueError("Missing validation category")
+
+        return grouped_results
 
     def validate_columns_with_validator(
         self,
@@ -115,13 +179,15 @@ class ValidationService:
 
         return validator.validate(suite)
 
-    def _create_filter_conditions(self, parsed_results: List[GXResultPerColumn]) -> List:
+    def _create_filter_conditions(
+        self, parsed_results: List[GXResultPerColumn]
+    ) -> List:
         filter_conditions = []
         for res in parsed_results:
             if res.success == False:
                 filter = {
                     "column": res.column,
-                    "values_to_remove": res.result_between_or_in_set.partial_unexpected_list,
+                    "values_to_remove": res.all_results.result_between_or_in_set.partial_unexpected_list,
                 }
                 filter_conditions.append(filter)
 
@@ -149,6 +215,8 @@ class ValidationService:
         (parsed_results, overall_result, stats) = self._parse_results_from_validator(
             validated_result
         )
+        parsed_results = self.group_by_parsed_results_by_column(parsed_results)
+        # print(f"\n\n\nparsed_results: {parsed_results}\n\n\n")
         final_df = self._make_df_with_is_good_col(parsed_results)
         return ValidatedResult(
             file_path=self.file_path,
@@ -156,7 +224,7 @@ class ValidationService:
             overall_statistics=stats,
             parsed_results_gx=parsed_results,
             docs_urls=docs_urls,
-            final_df=final_df
+            final_df=final_df,
         )
 
 

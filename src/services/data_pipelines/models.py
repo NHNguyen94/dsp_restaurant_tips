@@ -33,12 +33,17 @@ class GXResultNotNullDetails:
 
 
 @dataclass
+class AllResults:
+    result_column_exist: bool = None
+    result_not_null: GXResultNotNullDetails = None
+    result_between_or_in_set: GXResultBetweenOrInSetDetails = None
+
+
+@dataclass
 class GXResultPerColumn:
     success: bool
     column: str
-    result_column_exist: bool
-    result_not_null: GXResultNotNullDetails
-    result_between_or_in_set: GXResultBetweenOrInSetDetails
+    all_results: AllResults
 
 
 @dataclass
