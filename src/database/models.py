@@ -28,6 +28,10 @@ class DataIssues(ProjectBaseModel, table=True):
     __tablename__ = "data_issues"
     id: UUID = Field(primary_key=True, default_factory=uuid4)
     file_path: str = Field(nullable=False, index=True)
+    evaluated_expectations: int = Field(nullable=False)
+    successful_expectations: int = Field(nullable=False)
+    unsuccessful_expectations: int = Field(nullable=False)
+    success_percent: float = Field(nullable=False)
     missing_columns: str = Field(nullable=False)
     missing_values: str = Field(nullable=False)
     duplicated_rows: str = Field(nullable=False)

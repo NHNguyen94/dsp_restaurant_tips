@@ -17,7 +17,7 @@ class TestValidationService:
             self.failed_test_csv_path, "failed batch"
         )
         result = validation_service.validate_data()
-        # print(f"\nresult_test_validate_data: {result}")
+        print(f"\nresult_test_validate_data: {result}")
         df = result.final_df
         total_good_cols = df["is_good"].sum()
         assert isinstance(result, ValidatedResult)

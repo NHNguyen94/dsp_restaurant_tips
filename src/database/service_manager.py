@@ -2,7 +2,7 @@ from typing import List
 
 from sqlmodel import select, col, func
 
-from src.database.models import Predictions
+from src.database.models import Predictions, DataIssues
 from src.database.session_manager import SessionManager
 
 
@@ -11,6 +11,11 @@ class DatabaseServiceManager:
         self.session_manager = SessionManager()
         self.session = self.session_manager.session()
         self.async_session = self.session_manager.async_session()
+
+    def append_data_issues(self, data_issues: DataIssues) -> None:
+        with self.session as session:
+            session.add(data_issues)
+            session.commit()
 
     def append_predictions(self, predictions: List[Predictions]) -> None:
         with self.session as session:
