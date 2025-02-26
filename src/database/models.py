@@ -23,6 +23,21 @@ class Predictions(ProjectBaseModel, table=True):
     tip: float = Field(nullable=False)
     created_at: datetime = Field(nullable=False, index=True)
 
+class DataIssues(ProjectBaseModel, table=True):
+    __tablename__ = "data_issues"
+    id: UUID = Field(primary_key=True, default_factory=uuid4)
+    file_path: str = Field(nullable=False, index=True)
+    missing_columns: str = Field(nullable=False)
+    missing_header: str = Field(nullable=False)
+    missing_values: str = Field(nullable=False)
+    duplicated_rows: str = Field(nullable=False)
+    unknown_categorical_values: str = Field(nullable=False)
+    unknon_numeric_values: str = Field(nullable=False)
+    outlier_values: str = Field(nullable=False)
+    bad_csv_encoding: str = Field(nullable=False)
+    bad_csv_format: str = Field(nullable=False)
+    created_at: datetime = Field(nullable=False, index=True)
+
 
 def get_engine():
     session_manager = SessionManager()
