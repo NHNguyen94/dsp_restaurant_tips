@@ -19,7 +19,7 @@ class DatabaseServiceManager:
             session.add(data_issues)
             session.commit()
 
-    def append_df_to_predictions(self, df_with_predictions: pd.DataFrame) -> None:
+    def append_df_to_predictions(self, df_with_predictions: pd.DataFrame, prediction_source) -> None:
         with self.session as session:
             # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
             for _, row in df_with_predictions.iterrows():
@@ -32,7 +32,7 @@ class DatabaseServiceManager:
                     time=row["time"],
                     size=row["size"],
                     tip=row["tip"],
-                    prediction_source="webapp",
+                    prediction_source=prediction_source,
                     predicted_at=DateTimeManager.get_current_local_time(),
                 )
                 session.add(prediction)
