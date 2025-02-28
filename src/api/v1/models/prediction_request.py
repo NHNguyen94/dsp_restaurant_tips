@@ -1,8 +1,28 @@
 from typing import Literal, Optional
+from src.utils.date_time_manager import DateTimeManager
+from pydantic import BaseModel, validator
 
-from pydantic import BaseModel
 
-from fastapi import HTTPException
+class PastPredictionRequest(BaseModel):
+    start_date: str
+    end_date: str
+    prediction_source: Literal["webapp", "scheduled_predictions", "all"] = "all"
+
+    @validator("start_date")
+    def start_date_must_be_valid(cls, v):
+        try:
+            DateTimeManager.parse_str_to_date(v)
+        except:
+            raise ValueError("start_date must be in the format YYYY-MM-DD")
+        return v
+
+    @validator("end_date")
+    def end_date_must_be_valid(cls, v):
+        try:
+            DateTimeManager.parse_str_to_date(v)
+        except:
+            raise ValueError("end_date must be in the format YYYY-MM-DD")
+        return v
 
 
 class PredictionRequest(BaseModel):
@@ -13,16 +33,17 @@ class PredictionRequest(BaseModel):
     time: Optional[Literal["Lunch", "Dinner"]] = None
     size: Optional[int] = None
 
-    # Ref: https://docs.pydantic.dev/latest/api/functional_validators/#pydantic.functional_validators.model_validator
-    # @model_validator(mode="after")
-    # def validate_numbers(self):
-    #     if self.total_bill is not None and self.size is not None:
-    #         if self.total_bill <= 0:
-    #             raise HTTPException(
-    #                 status_code=400, detail="total_bill must be greater than 0."
-    #             )
-    #         if self.size <= 0:
-    #             raise HTTPException(
-    #                 status_code=400, detail="size must be greater than 0."
-    #             )
-    #     return self
+    # https://docs.pydantic.dev/1.10/usage/validators/
+    @validator("total_bill")
+    def total_bill_must_be_positive(cls, v):
+        if v is not None:
+            if v < 0:
+                raise ValueError("total_bill must be positive")
+            return v
+
+    @validator("size")
+    def size_must_be_positive(cls, v):
+        if v is not None:
+            if v < 0:
+                raise ValueError("size must be positive")
+            return v
