@@ -7,7 +7,7 @@ sys.path.insert(0, project_dir)
 
 from airflow.decorators import dag, task
 
-from services.data_pipelines.models import ValidatedResult
+from src.services.data_pipelines.models import ValidatedResult
 
 from src.services.data_pipelines.ingest import (
     run_ingest_data,

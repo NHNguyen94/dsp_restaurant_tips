@@ -6,7 +6,9 @@ from src.utils.date_time_manager import DateTimeManager
 db_service_manager = DatabaseServiceManager()
 
 
-def _parse_validated_results_to_data_issues(validated_result: ValidatedResult) -> DataIssues:
+def _parse_validated_results_to_data_issues(
+    validated_result: ValidatedResult,
+) -> DataIssues:
     missing_columns = 0
     missing_values = 0
     duplicated_rows = 0
@@ -31,9 +33,13 @@ def _parse_validated_results_to_data_issues(validated_result: ValidatedResult) -
                 missing_values += 1
             if all_res.result_between_or_in_set is not None:
                 if res.column in ["sex", "smoker", "day", "time"]:
-                    unknown_categorical_values += all_res.result_between_or_in_set.unexpected_count
+                    unknown_categorical_values += (
+                        all_res.result_between_or_in_set.unexpected_count
+                    )
                 if res.column in ["total_bill", "size"]:
-                    unknon_numeric_values += all_res.result_between_or_in_set.unexpected_count
+                    unknon_numeric_values += (
+                        all_res.result_between_or_in_set.unexpected_count
+                    )
 
     return DataIssues(
         file_path=validated_result.file_path,

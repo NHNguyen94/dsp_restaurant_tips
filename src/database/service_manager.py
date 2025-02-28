@@ -34,7 +34,8 @@ class DatabaseServiceManager:
         with self.session as session:
             # https://sqlmodel.tiangolo.com/tutorial/select/#sqlmodels-sessionexec
             query = select(Predictions.file_path).where(
-                col(Predictions.file_path).in_(new_files)
+                col(Predictions.file_path).in_(new_files),
+                col(Predictions.file_path).is_not(None),
             )
             predicted_files = session.execute(query).all()
             predicted_files = [
@@ -42,8 +43,12 @@ class DatabaseServiceManager:
             ]
             return predicted_files
 
-    def get_predicted_results_by_date(self, date: str) -> List[Predictions]:
+    def get_predicted_results_by_date_range(
+        self, start_date: str, end_date: str
+    ) -> List[Predictions]:
         with self.session as session:
-            query = select(Predictions).where(func.date(Predictions.created_at) == date)
+            query = select(Predictions).where(
+                func.date(Predictions.predicted_at).between(start_date, end_date)
+            )
             predictions = session.execute(query).all()
             return predictions

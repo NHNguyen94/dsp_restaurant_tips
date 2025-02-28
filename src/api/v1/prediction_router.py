@@ -2,7 +2,11 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, UploadFile, File, Depends
 
-from src.api.v1.models import PredictionRequest, PredictionResponse
+from src.api.v1.models import (
+    PredictionRequest,
+    PredictionResponse,
+    PastPredictionRequest,
+)
 from src.database.models import Predictions
 from src.database.service_manager import DatabaseServiceManager
 from src.services.ml_pipelines.inference import async_predict_response_with_features
@@ -50,6 +54,8 @@ async def predict(
 
 
 @router.post("/past-predictions", response_model=List[PredictionResponse])
-async def past_predictions(date: str):
-    predicted_results = db_service_manager.get_predicted_results_by_date(date)
+async def past_predictions(request: PastPredictionRequest):
+    predicted_results = db_service_manager.get_predicted_results_by_date_range(
+        request.start_date, request.end_date
+    )
     return _parse_predictions_to_api_response(predicted_results)
