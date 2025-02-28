@@ -187,3 +187,5 @@ airflow-webserver.pid
 airflow-scheduler.pid
 airflow.cfg
 /webserver_config.py
+/prometheus_data/
+/grafana_data/
