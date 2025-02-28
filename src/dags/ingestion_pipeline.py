@@ -51,9 +51,6 @@ def ingestion_pipeline():
     @task
     def build_save_statistics(validated_result: ValidatedResult) -> None:
         if validated_result.overall_result == False:
-            logging.warning(
-                f"validated_result.overall_statistics: {validated_result.overall_statistics}"
-            )
             run_save_statistics(validated_result)
 
     ingested_file = ingest()

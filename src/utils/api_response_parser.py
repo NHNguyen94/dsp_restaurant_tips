@@ -16,7 +16,7 @@ class ApiResponseParser:
             Predictions(
                 **res,
                 prediction_source=prediction_source,
-                created_at=DateTimeManager.get_current_local_time(),
+                predicted_at=DateTimeManager.get_current_local_time(),
             )
             for res in response
         ]
