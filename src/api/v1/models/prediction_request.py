@@ -6,7 +6,7 @@ from pydantic import BaseModel, validator
 class PastPredictionRequest(BaseModel):
     start_date: str
     end_date: str
-    prediction_source: Literal["webapp", "scheduled_prediction", "all"] = "all"
+    prediction_source: Literal["webapp", "scheduled_predictions", "all"] = "all"
 
     @validator("start_date")
     def start_date_must_be_valid(cls, v):
@@ -36,12 +36,14 @@ class PredictionRequest(BaseModel):
     # https://docs.pydantic.dev/1.10/usage/validators/
     @validator("total_bill")
     def total_bill_must_be_positive(cls, v):
-        if v < 0:
-            raise ValueError("total_bill must be positive")
-        return v
+        if v is not None:
+            if v < 0:
+                raise ValueError("total_bill must be positive")
+            return v
 
     @validator("size")
     def size_must_be_positive(cls, v):
-        if v < 0:
-            raise ValueError("size must be positive")
-        return v
+        if v is not None:
+            if v < 0:
+                raise ValueError("size must be positive")
+            return v

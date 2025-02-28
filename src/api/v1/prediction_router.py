@@ -50,12 +50,13 @@ async def predict(
         raise ValueError("Either request body or input file must be provided.")
 
     df_with_predictions = await async_predict_response_with_features(df)
+    db_service_manager.append_df_to_predictions(df_with_predictions)
     return df_with_predictions.to_dict(orient="records")
 
 
 @router.post("/past-predictions", response_model=List[PredictionResponse])
 async def past_predictions(request: PastPredictionRequest):
     predicted_results = db_service_manager.get_predicted_results_by_date_range(
-        request.start_date, request.end_date
+        request.start_date, request.end_date, request.prediction_source
     )
     return _parse_predictions_to_api_response(predicted_results)
