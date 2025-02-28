@@ -55,7 +55,7 @@ async def predict(
 
 
 @router.post("/past-predictions", response_model=List[PredictionResponse])
-async def past_predictions(request: PastPredictionRequest):
+async def past_predictions(request: Annotated[PastPredictionRequest, Depends()]):
     predicted_results = db_service_manager.get_predicted_results_by_date_range(
         request.start_date, request.end_date, request.prediction_source
     )

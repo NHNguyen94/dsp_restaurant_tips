@@ -77,7 +77,7 @@ class ValidationService:
     ) -> (List[GXResultPerColumn], bool, OverallStatistics):
         parsed_results = []
         overall_result = input_results["success"]
-        stats = input_results["statistics"]
+        stats = OverallStatistics(**input_results["statistics"])
 
         results = input_results["results"]
         for res in results:

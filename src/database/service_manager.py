@@ -36,6 +36,7 @@ class DatabaseServiceManager:
                     predicted_at=DateTimeManager.get_current_local_time(),
                 )
                 session.add(prediction)
+            session.commit()
 
     def append_predictions(self, predictions: List[Predictions]) -> None:
         with self.session as session:
