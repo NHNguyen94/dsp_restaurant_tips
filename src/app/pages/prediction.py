@@ -40,4 +40,8 @@ if submit:
     response = request.json()
 
 if response:
+<<<<<<< HEAD
     st.dataframe(response)
+=======
+    st.dataframe(response)
+>>>>>>> main
