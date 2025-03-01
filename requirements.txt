@@ -17,19 +17,5 @@ psycopg2-binary==2.9.10
 pymsteams==0.2.4
 alembic==1.14.1
 apache-airflow-providers-postgres==5.13.0
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-requests==2.32.3
-=======
 requests==2.32.3
 pyroscope-io==0.8.8
->>>>>>> main
-=======
-requests==2.32.3
-pyroscope-io==0.8.8
->>>>>>> main
-=======
-requests==2.32.3
-pyroscope-io==0.8.8
->>>>>>> main

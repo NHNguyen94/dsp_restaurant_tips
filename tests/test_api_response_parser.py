@@ -32,19 +32,7 @@ class TestApiResponseParser:
                 "tip": 3.36,
             },
         ]
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        response = ApiResponseParser.parse_response(test_data)
-=======
         response = ApiResponseParser.parse_response(test_data, prediction_source="test")
->>>>>>> main
-=======
-        response = ApiResponseParser.parse_response(test_data, prediction_source="test")
->>>>>>> main
-=======
-        response = ApiResponseParser.parse_response(test_data, prediction_source="test")
->>>>>>> main
         assert len(response) == 3
         assert response[0].total_bill == 16.99
         assert response[1].day == "Sun"

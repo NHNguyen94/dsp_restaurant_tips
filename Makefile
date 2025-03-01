@@ -24,18 +24,6 @@ run-frontend:
 
 split-dataset:
 	PYTHONPATH=. poetry run python src/services/data_pipelines/split_data.py 25
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-run-frontend:
-	streamlit run src/app/app.py
-=======
->>>>>>> main
-=======
->>>>>>> main
-=======
->>>>>>> main
 
 pre-process-data:
 	PYTHONPATH=. python src/services/ml_pipelines/pre_processing.py

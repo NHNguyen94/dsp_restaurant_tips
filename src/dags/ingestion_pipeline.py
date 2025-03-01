@@ -8,37 +8,14 @@ sys.path.insert(0, project_dir)
 
 from airflow.decorators import dag, task
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-from src.services.data_pipelines.models.validated_result import ValidatedResult
-=======
 from src.services.data_pipelines.models import ValidatedResult
->>>>>>> main
-=======
-from src.services.data_pipelines.models import ValidatedResult
->>>>>>> main
-=======
-from src.services.data_pipelines.models import ValidatedResult
->>>>>>> main
 
 from src.services.data_pipelines.ingest import (
     run_ingest_data,
     run_validate_data,
     run_save_file,
     run_alert,
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     run_save_statistics,
->>>>>>> main
-=======
-    run_save_statistics,
->>>>>>> main
-=======
-    run_save_statistics,
->>>>>>> main
 )
 
 from airflow.utils.dates import days_ago
@@ -64,22 +41,8 @@ def ingestion_pipeline():
 
     @task
     def build_alert(validated_result: ValidatedResult) -> None:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        run_alert(validated_result)
-=======
         if validated_result.overall_result == False:
             run_alert(validated_result)
->>>>>>> main
-=======
-        if validated_result.overall_result == False:
-            run_alert(validated_result)
->>>>>>> main
-=======
-        if validated_result.overall_result == False:
-            run_alert(validated_result)
->>>>>>> main
 
     @task
     def build_save_file(validated_result: ValidatedResult) -> None:
@@ -87,22 +50,8 @@ def ingestion_pipeline():
 
     @task
     def build_save_statistics(validated_result: ValidatedResult) -> None:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        pass
-=======
         if validated_result.overall_result == False:
             run_save_statistics(validated_result)
->>>>>>> main
-=======
-        if validated_result.overall_result == False:
-            run_save_statistics(validated_result)
->>>>>>> main
-=======
-        if validated_result.overall_result == False:
-            run_save_statistics(validated_result)
->>>>>>> main
 
     ingested_file = ingest()
     validated_result = build_validate(ingested_file)

@@ -1,16 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-from datetime import datetime, timezone, timedelta
-=======
 from datetime import datetime, timezone, timedelta, date
->>>>>>> main
-=======
-from datetime import datetime, timezone, timedelta, date
->>>>>>> main
-=======
-from datetime import datetime, timezone, timedelta, date
->>>>>>> main
 
 
 class DateTimeManager:
@@ -31,22 +19,7 @@ class DateTimeManager:
         return (datetime.now() - timedelta(hours=hours_ago)).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> main
-=======
->>>>>>> main
 
     @staticmethod
     def parse_str_to_date(date_str: str) -> date:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> main
-=======
->>>>>>> main
-=======
->>>>>>> main

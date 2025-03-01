@@ -1,15 +1,5 @@
 import http.client
 import json
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-import logging
-=======
->>>>>>> main
-=======
->>>>>>> main
-=======
->>>>>>> main
 import mimetypes
 import os
 import uuid
@@ -27,28 +17,10 @@ class ApiController:
     def __init__(self):
         self.url = os.getenv("API_URL")
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    def predict_with_file_manual_request(self, file_path: str) -> List[Dict]:
-        host = "127.0.0.1:8000"
-        url = "/v1/prediction/predict"
-=======
-=======
->>>>>>> main
-=======
->>>>>>> main
     def predict_with_file_manual_request(self, file_path: str, prediction_source: str) -> List[Dict]:
         host = "127.0.0.1:8000"
         # url = "/v1/prediction/predict"
         url = f"/v1/prediction/predict?prediction_source={prediction_source}"
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> main
-=======
->>>>>>> main
-=======
->>>>>>> main
 
         boundary = str(uuid.uuid4())
         body = BytesIO()
