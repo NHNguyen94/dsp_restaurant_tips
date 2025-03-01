@@ -4,8 +4,11 @@ from fastapi import APIRouter, UploadFile, File, Depends
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.api.v1.models import PredictionRequest, PredictionResponse
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 from src.api.v1.models import (
@@ -14,6 +17,9 @@ from src.api.v1.models import (
     PastPredictionRequest,
 )
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -32,7 +38,11 @@ db_service_manager = DatabaseServiceManager()
 def _parse_predictions_to_api_response(
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     predictions: List[Predictions],
+=======
+        predictions: List[Predictions],
+>>>>>>> main
 =======
         predictions: List[Predictions],
 >>>>>>> main
@@ -76,10 +86,13 @@ async def predict(
 @router.post("/past-predictions", response_model=List[PredictionResponse])
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 async def past_predictions(date: str):
     predicted_results = db_service_manager.get_predicted_results_by_date(date)
     print(f"predicted_results: {predicted_results[:3]}")
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 async def past_predictions(request: Annotated[PastPredictionRequest, Depends()]):
@@ -87,6 +100,9 @@ async def past_predictions(request: Annotated[PastPredictionRequest, Depends()])
         request.start_date, request.end_date, request.prediction_source
     )
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main

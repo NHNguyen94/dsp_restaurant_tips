@@ -7,9 +7,12 @@ class TestDatabase:
     def test_get_predicted_results_by_date(self):
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         date = "2025-02-24"
         predicted_results = self.db_service_manager.get_predicted_results_by_date(date)
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
         start_date = "2025-02-24"
@@ -18,6 +21,9 @@ class TestDatabase:
             start_date, end_date, "all"
         )
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main

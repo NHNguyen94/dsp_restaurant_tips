@@ -19,9 +19,12 @@ api_response_parser = ApiResponseParser()
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def _parse_response(response: List[Dict], file_path: str) -> List[Predictions]:
     api_response = api_response_parser.parse_response(response)
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 def _parse_response(
@@ -31,6 +34,9 @@ def _parse_response(
         response, prediction_source=prediction_source
     )
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -41,10 +47,13 @@ def _parse_response(
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def run_predict_single_file(file_path: str) -> List[Predictions]:
     response = api_controller.predict_with_file_manual_request(file_path)
     return _parse_response(response, file_path)
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 def run_predict_single_file(
@@ -53,6 +62,9 @@ def run_predict_single_file(
     response = api_controller.predict_with_file_manual_request(file_path, prediction_source)
     return _parse_response(response, file_path, prediction_source)
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -67,12 +79,15 @@ def run_predict_single_file(
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def run_predictions(file_paths: List[str]) -> None:
     for file_path in file_paths:
         predictions = run_predict_single_file(file_path)
         logging.warning(f"Predictions: {predictions} for file: {file_path}")
         db_service_manager.append_predictions(predictions)
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 def run_predictions(file_paths: List[str], prediction_source: str) -> None:
@@ -82,6 +97,9 @@ def run_predictions(file_paths: List[str], prediction_source: str) -> None:
         )
         # db_service_manager.append_predictions(predictions)
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main

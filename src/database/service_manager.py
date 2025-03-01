@@ -2,11 +2,14 @@ from typing import List
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from sqlmodel import select, col, func
 
 from src.database.models import Predictions
 from src.database.session_manager import SessionManager
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 import pandas as pd
@@ -16,6 +19,9 @@ from src.database.models import Predictions, DataIssues
 from src.database.session_manager import SessionManager
 from src.utils.date_time_manager import DateTimeManager
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -27,6 +33,7 @@ class DatabaseServiceManager:
         self.session = self.session_manager.session()
         self.async_session = self.session_manager.async_session()
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     def append_predictions(self, predictions: List[Predictions]) -> None:
@@ -47,6 +54,13 @@ class DatabaseServiceManager:
             session.add(data_issues)
             session.commit()
 
+=======
+    def append_data_issues(self, data_issues: DataIssues) -> None:
+        with self.session as session:
+            session.add(data_issues)
+            session.commit()
+
+>>>>>>> main
 =======
     def append_data_issues(self, data_issues: DataIssues) -> None:
         with self.session as session:
@@ -86,6 +100,9 @@ class DatabaseServiceManager:
             await session.commit()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -96,7 +113,12 @@ class DatabaseServiceManager:
             query = select(Predictions.file_path).where(
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 col(Predictions.file_path).in_(new_files)
+=======
+                col(Predictions.file_path).in_(new_files),
+                col(Predictions.file_path).is_not(None),
+>>>>>>> main
 =======
                 col(Predictions.file_path).in_(new_files),
                 col(Predictions.file_path).is_not(None),
@@ -114,10 +136,13 @@ class DatabaseServiceManager:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     def get_predicted_results_by_date(self, date: str) -> List[Predictions]:
         with self.session as session:
             query = select(Predictions).where(func.date(Predictions.created_at) == date)
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
     def get_predicted_results_by_date_range(
@@ -133,6 +158,9 @@ class DatabaseServiceManager:
                 col(Predictions.prediction_source).in_(prediction_source),
             )
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main

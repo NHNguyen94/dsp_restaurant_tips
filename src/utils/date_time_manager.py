@@ -1,6 +1,10 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from datetime import datetime, timezone, timedelta
+=======
+from datetime import datetime, timezone, timedelta, date
+>>>>>>> main
 =======
 from datetime import datetime, timezone, timedelta, date
 >>>>>>> main
@@ -29,7 +33,10 @@ class DateTimeManager:
         )
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 
@@ -37,6 +44,9 @@ class DateTimeManager:
     def parse_str_to_date(date_str: str) -> date:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main

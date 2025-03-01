@@ -1,7 +1,11 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from pprint import pprint
 from typing import Dict, List, Union
+=======
+from typing import List, Union
+>>>>>>> main
 =======
 from typing import List, Union
 >>>>>>> main
@@ -27,8 +31,11 @@ from great_expectations.validator.validator import Validator
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.services.data_pipelines.models.validated_result import ValidatedResult
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 from src.services.data_pipelines.models import (
@@ -40,6 +47,9 @@ from src.services.data_pipelines.models import (
     AllResults,
 )
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -92,6 +102,7 @@ class ValidationService:
         self,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
     ) -> (List, bool):
         parsed_results = []
@@ -106,6 +117,8 @@ class ValidationService:
             parsed_results.append(details)
         return (parsed_results, overall_result)
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
         input_results: Union[
@@ -186,6 +199,9 @@ class ValidationService:
 
         return grouped_results
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -201,7 +217,10 @@ class ValidationService:
         for k, v in self.expected_data.items():
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
             expectation_col = gx.expectations.ExpectColumnToExist(column=k)
@@ -209,6 +228,9 @@ class ValidationService:
             expectation_value = gx.expectations.ExpectColumnValuesToNotBeNull(column=k)
             suite.add_expectation(expectation_value)
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -231,6 +253,7 @@ class ValidationService:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     def _create_filter_conditions(self, parsed_results: List) -> List:
         filter_conditions = []
         for res in parsed_results:
@@ -239,6 +262,8 @@ class ValidationService:
                     "column": res["column"],
                     "values_to_remove": res["result"]["partial_unexpected_list"],
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
     def _create_filter_conditions(
@@ -251,6 +276,9 @@ class ValidationService:
                     "column": res.column,
                     "values_to_remove": res.all_results.result_between_or_in_set.partial_unexpected_list,
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main
@@ -261,7 +289,13 @@ class ValidationService:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     def _make_df_with_is_good_col(self, parsed_results: List) -> pd.DataFrame:
+=======
+    def _make_df_with_is_good_col(
+        self, parsed_results: List[GXResultPerColumn]
+    ) -> pd.DataFrame:
+>>>>>>> main
 =======
     def _make_df_with_is_good_col(
         self, parsed_results: List[GXResultPerColumn]
@@ -290,6 +324,7 @@ class ValidationService:
         docs_urls = self._build_datadocs_urls(validated_result)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         (parsed_results, overall_result) = self._parse_results_from_validator(
             validated_result
         )
@@ -297,6 +332,8 @@ class ValidationService:
         return ValidatedResult(
             self.file_path, parsed_results, overall_result, docs_urls, final_df
 =======
+=======
+>>>>>>> main
 =======
 >>>>>>> main
         (parsed_results, overall_result, stats) = self._parse_results_from_validator(
@@ -313,6 +350,9 @@ class ValidationService:
             docs_urls=docs_urls,
             final_df=final_df,
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 =======
 >>>>>>> main

@@ -42,7 +42,11 @@ if submit:
 if response:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     st.dataframe(response)
+=======
+    st.dataframe(response)
+>>>>>>> main
 =======
     st.dataframe(response)
 >>>>>>> main
