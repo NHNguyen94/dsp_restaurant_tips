@@ -9,7 +9,11 @@ sys.path.insert(0, project_dir)
 from airflow.decorators import dag, task
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.services.data_pipelines.models.validated_result import ValidatedResult
+=======
+from src.services.data_pipelines.models import ValidatedResult
+>>>>>>> main
 =======
 from src.services.data_pipelines.models import ValidatedResult
 >>>>>>> main
@@ -20,6 +24,10 @@ from src.services.data_pipelines.ingest import (
     run_save_file,
     run_alert,
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    run_save_statistics,
+>>>>>>> main
 =======
     run_save_statistics,
 >>>>>>> main
@@ -49,7 +57,12 @@ def ingestion_pipeline():
     @task
     def build_alert(validated_result: ValidatedResult) -> None:
 <<<<<<< HEAD
+<<<<<<< HEAD
         run_alert(validated_result)
+=======
+        if validated_result.overall_result == False:
+            run_alert(validated_result)
+>>>>>>> main
 =======
         if validated_result.overall_result == False:
             run_alert(validated_result)
@@ -62,7 +75,12 @@ def ingestion_pipeline():
     @task
     def build_save_statistics(validated_result: ValidatedResult) -> None:
 <<<<<<< HEAD
+<<<<<<< HEAD
         pass
+=======
+        if validated_result.overall_result == False:
+            run_save_statistics(validated_result)
+>>>>>>> main
 =======
         if validated_result.overall_result == False:
             run_save_statistics(validated_result)

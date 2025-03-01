@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.services.data_pipelines.models.validated_result import ValidatedResult
+=======
+from src.services.data_pipelines.models import ValidatedResult
+>>>>>>> main
 =======
 from src.services.data_pipelines.models import ValidatedResult
 >>>>>>> main

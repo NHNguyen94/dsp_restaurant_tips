@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from src.services.data_pipelines.models.validated_result import ValidatedResult
+=======
+from src.services.data_pipelines.models import ValidatedResult
+>>>>>>> main
 =======
 from src.services.data_pipelines.models import ValidatedResult
 >>>>>>> main
@@ -14,12 +18,15 @@ class TestValidationService:
             self.failed_test_csv_path, "failed batch"
         )
 <<<<<<< HEAD
+<<<<<<< HEAD
         result = validation_service.validate_data()
         df = result.final_df
         total_good_cols = df["is_good"].sum()
         # assert isinstance(result, ValidatedResult)
         # assert total_good_cols == 1
 =======
+=======
+>>>>>>> main
         result = validation_service.validate_columns_with_validator()
         # print(f"\nresult_test_validate_columns_with_validator: {result}")
 
@@ -33,4 +40,7 @@ class TestValidationService:
         total_good_cols = df["is_good"].sum()
         assert isinstance(result, ValidatedResult)
         assert total_good_cols == 1
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main

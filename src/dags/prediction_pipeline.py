@@ -27,7 +27,11 @@ def prediction_pipeline():
     @task
     def build_predictions(new_files: List[str]) -> None:
 <<<<<<< HEAD
+<<<<<<< HEAD
         run_predictions(new_files)
+=======
+        run_predictions(new_files, "scheduled_predictions")
+>>>>>>> main
 =======
         run_predictions(new_files, "scheduled_predictions")
 >>>>>>> main

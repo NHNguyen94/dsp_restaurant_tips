@@ -188,6 +188,11 @@ airflow-scheduler.pid
 airflow.cfg
 /webserver_config.py
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+/prometheus_data/
+/grafana_data/
+>>>>>>> main
 =======
 /prometheus_data/
 /grafana_data/

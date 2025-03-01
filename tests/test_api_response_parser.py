@@ -33,7 +33,11 @@ class TestApiResponseParser:
             },
         ]
 <<<<<<< HEAD
+<<<<<<< HEAD
         response = ApiResponseParser.parse_response(test_data)
+=======
+        response = ApiResponseParser.parse_response(test_data, prediction_source="test")
+>>>>>>> main
 =======
         response = ApiResponseParser.parse_response(test_data, prediction_source="test")
 >>>>>>> main

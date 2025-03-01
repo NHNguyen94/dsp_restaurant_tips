@@ -1,17 +1,23 @@
 from typing import List
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 from sqlmodel import select, col, func
 
 from src.database.models import Predictions
 from src.database.session_manager import SessionManager
 =======
+=======
+>>>>>>> main
 import pandas as pd
 from sqlmodel import select, col, func
 
 from src.database.models import Predictions, DataIssues
 from src.database.session_manager import SessionManager
 from src.utils.date_time_manager import DateTimeManager
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
 
 
@@ -21,6 +27,7 @@ class DatabaseServiceManager:
         self.session = self.session_manager.session()
         self.async_session = self.session_manager.async_session()
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     def append_predictions(self, predictions: List[Predictions]) -> None:
         with self.session as session:
@@ -40,6 +47,13 @@ class DatabaseServiceManager:
             session.add(data_issues)
             session.commit()
 
+=======
+    def append_data_issues(self, data_issues: DataIssues) -> None:
+        with self.session as session:
+            session.add(data_issues)
+            session.commit()
+
+>>>>>>> main
     def append_df_to_predictions(self, df_with_predictions: pd.DataFrame, prediction_source) -> None:
         with self.session as session:
             # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
@@ -71,6 +85,9 @@ class DatabaseServiceManager:
                 session.add(prediction)
             await session.commit()
 
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
     def get_predicted_files(self, new_files: List[str]) -> List[str]:
         # https://sqlmodel.tiangolo.com/tutorial/where/#type-annotations-and-errors
@@ -78,7 +95,12 @@ class DatabaseServiceManager:
             # https://sqlmodel.tiangolo.com/tutorial/select/#sqlmodels-sessionexec
             query = select(Predictions.file_path).where(
 <<<<<<< HEAD
+<<<<<<< HEAD
                 col(Predictions.file_path).in_(new_files)
+=======
+                col(Predictions.file_path).in_(new_files),
+                col(Predictions.file_path).is_not(None),
+>>>>>>> main
 =======
                 col(Predictions.file_path).in_(new_files),
                 col(Predictions.file_path).is_not(None),
@@ -91,10 +113,13 @@ class DatabaseServiceManager:
             return predicted_files
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def get_predicted_results_by_date(self, date: str) -> List[Predictions]:
         with self.session as session:
             query = select(Predictions).where(func.date(Predictions.created_at) == date)
 =======
+=======
+>>>>>>> main
     def get_predicted_results_by_date_range(
         self, start_date: str, end_date: str, prediction_source: str
     ) -> List[Predictions]:
@@ -107,6 +132,9 @@ class DatabaseServiceManager:
                 func.date(Predictions.predicted_at).between(start_date, end_date),
                 col(Predictions.prediction_source).in_(prediction_source),
             )
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
             predictions = session.execute(query).all()
             return predictions

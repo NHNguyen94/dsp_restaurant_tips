@@ -14,7 +14,11 @@ class Predictions(ProjectBaseModel, table=True):
     __tablename__ = "predictions"
     id: UUID = Field(primary_key=True, default_factory=uuid4)
 <<<<<<< HEAD
+<<<<<<< HEAD
     file_path: str = Field(nullable=False, index=True)
+=======
+    file_path: str = Field(nullable=True, index=True)
+>>>>>>> main
 =======
     file_path: str = Field(nullable=True, index=True)
 >>>>>>> main
@@ -26,7 +30,10 @@ class Predictions(ProjectBaseModel, table=True):
     size: int = Field(nullable=False)
     tip: float = Field(nullable=False)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> main
     prediction_source: str = Field(nullable=False)
     predicted_at: datetime = Field(nullable=False, index=True)
 
@@ -46,6 +53,9 @@ class DataIssues(ProjectBaseModel, table=True):
     unknon_numeric_values: str = Field(nullable=False)
     bad_csv_encoding: str = Field(nullable=False)
     bad_csv_format: str = Field(nullable=False)
+<<<<<<< HEAD
+>>>>>>> main
+=======
 >>>>>>> main
     created_at: datetime = Field(nullable=False, index=True)
 

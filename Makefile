@@ -25,9 +25,12 @@ run-frontend:
 split-dataset:
 	PYTHONPATH=. poetry run python src/services/data_pipelines/split_data.py 25
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 run-frontend:
 	streamlit run src/app/app.py
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 
