@@ -1,8 +1,12 @@
-from typing import List, Annotated
+from typing import List, Annotated, Literal
 
 from fastapi import APIRouter, UploadFile, File, Depends
 
-from src.api.v1.models import PredictionRequest, PredictionResponse
+from src.api.v1.models import (
+    PredictionRequest,
+    PredictionResponse,
+    PastPredictionRequest,
+)
 from src.database.models import Predictions
 from src.database.service_manager import DatabaseServiceManager
 from src.services.ml_pipelines.inference import async_predict_response_with_features
@@ -16,7 +20,7 @@ db_service_manager = DatabaseServiceManager()
 
 
 def _parse_predictions_to_api_response(
-    predictions: List[Predictions],
+        predictions: List[Predictions],
 ) -> List[PredictionResponse]:
     responses = []
     for (prediction,) in predictions:
@@ -35,8 +39,9 @@ def _parse_predictions_to_api_response(
 
 @router.post("/predict", response_model=List[PredictionResponse])
 async def predict(
-    input_json: Annotated[PredictionRequest, Depends()] = None,
-    input_file: Annotated[UploadFile, File()] = None,
+        input_json: Annotated[PredictionRequest, Depends()] = None,
+        input_file: Annotated[UploadFile, File()] = None,
+        prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp"
 ):
     if ValidationManager.validate_none_json_request(input_json) == False:
         df = api_request_parser.parse_request_to_df(input_json)
@@ -46,11 +51,13 @@ async def predict(
         raise ValueError("Either request body or input file must be provided.")
 
     df_with_predictions = await async_predict_response_with_features(df)
+    db_service_manager.append_df_to_predictions(df_with_predictions, prediction_source)
     return df_with_predictions.to_dict(orient="records")
 
 
 @router.post("/past-predictions", response_model=List[PredictionResponse])
-async def past_predictions(date: str):
-    predicted_results = db_service_manager.get_predicted_results_by_date(date)
-    print(f"predicted_results: {predicted_results[:3]}")
+async def past_predictions(request: Annotated[PastPredictionRequest, Depends()]):
+    predicted_results = db_service_manager.get_predicted_results_by_date_range(
+        request.start_date, request.end_date, request.prediction_source
+    )
     return _parse_predictions_to_api_response(predicted_results)

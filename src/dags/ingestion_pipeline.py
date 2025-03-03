@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import sys
 
@@ -7,13 +8,14 @@ sys.path.insert(0, project_dir)
 
 from airflow.decorators import dag, task
 
-from src.services.data_pipelines.models.validated_result import ValidatedResult
+from src.services.data_pipelines.models import ValidatedResult
 
 from src.services.data_pipelines.ingest import (
     run_ingest_data,
     run_validate_data,
     run_save_file,
     run_alert,
+    run_save_statistics,
 )
 
 from airflow.utils.dates import days_ago
@@ -23,7 +25,7 @@ from airflow.utils.dates import days_ago
     dag_id="ingestion_pipeline",
     description="Ingestion pipeline",
     tags=["ingestion"],
-    schedule_interval=datetime.timedelta(seconds=60),
+    schedule_interval=datetime.timedelta(seconds=30),
     start_date=days_ago(n=0, hour=1),
     max_active_runs=1,
     catchup=False,
@@ -39,7 +41,8 @@ def ingestion_pipeline():
 
     @task
     def build_alert(validated_result: ValidatedResult) -> None:
-        run_alert(validated_result)
+        if validated_result.overall_result == False:
+            run_alert(validated_result)
 
     @task
     def build_save_file(validated_result: ValidatedResult) -> None:
@@ -47,7 +50,8 @@ def ingestion_pipeline():
 
     @task
     def build_save_statistics(validated_result: ValidatedResult) -> None:
-        pass
+        if validated_result.overall_result == False:
+            run_save_statistics(validated_result)
 
     ingested_file = ingest()
     validated_result = build_validate(ingested_file)

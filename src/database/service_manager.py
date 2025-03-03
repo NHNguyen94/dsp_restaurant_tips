@@ -1,9 +1,11 @@
 from typing import List
 
+import pandas as pd
 from sqlmodel import select, col, func
 
-from src.database.models import Predictions
+from src.database.models import Predictions, DataIssues
 from src.database.session_manager import SessionManager
+from src.utils.date_time_manager import DateTimeManager
 
 
 class DatabaseServiceManager:
@@ -11,6 +13,30 @@ class DatabaseServiceManager:
         self.session_manager = SessionManager()
         self.session = self.session_manager.session()
         self.async_session = self.session_manager.async_session()
+
+    def append_data_issues(self, data_issues: DataIssues) -> None:
+        with self.session as session:
+            session.add(data_issues)
+            session.commit()
+
+    def append_df_to_predictions(self, df_with_predictions: pd.DataFrame, prediction_source) -> None:
+        with self.session as session:
+            # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
+            for _, row in df_with_predictions.iterrows():
+                prediction = Predictions(
+                    file_path=None,
+                    total_bill=row["total_bill"],
+                    sex=row["sex"],
+                    smoker=row["smoker"],
+                    day=row["day"],
+                    time=row["time"],
+                    size=row["size"],
+                    tip=row["tip"],
+                    prediction_source=prediction_source,
+                    predicted_at=DateTimeManager.get_current_local_time(),
+                )
+                session.add(prediction)
+            session.commit()
 
     def append_predictions(self, predictions: List[Predictions]) -> None:
         with self.session as session:
@@ -29,7 +55,8 @@ class DatabaseServiceManager:
         with self.session as session:
             # https://sqlmodel.tiangolo.com/tutorial/select/#sqlmodels-sessionexec
             query = select(Predictions.file_path).where(
-                col(Predictions.file_path).in_(new_files)
+                col(Predictions.file_path).in_(new_files),
+                col(Predictions.file_path).is_not(None),
             )
             predicted_files = session.execute(query).all()
             predicted_files = [
@@ -37,8 +64,17 @@ class DatabaseServiceManager:
             ]
             return predicted_files
 
-    def get_predicted_results_by_date(self, date: str) -> List[Predictions]:
+    def get_predicted_results_by_date_range(
+        self, start_date: str, end_date: str, prediction_source: str
+    ) -> List[Predictions]:
+        if prediction_source == "all":
+            prediction_source = ["webapp", "scheduled_predictions"]
+        else:
+            prediction_source = [prediction_source]
         with self.session as session:
-            query = select(Predictions).where(func.date(Predictions.created_at) == date)
+            query = select(Predictions).where(
+                func.date(Predictions.predicted_at).between(start_date, end_date),
+                col(Predictions.prediction_source).in_(prediction_source),
+            )
             predictions = session.execute(query).all()
             return predictions

@@ -19,7 +19,7 @@ class TestDataPipelines:
 
     def test_run_predict_single_file(self):
         file_path = "tests/resources/test_tips.csv"
-        response = run_predict_single_file(file_path)
+        response = run_predict_single_file(file_path, prediction_source="test")
         print(f"\nresponse from single file prediction: {response}")
 
     # Enable when needed only, this will write into DB

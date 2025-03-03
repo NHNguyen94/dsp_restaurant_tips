@@ -8,7 +8,6 @@ from src.api.v1.models.prediction_request import PredictionRequest
 class ValidationManager:
     @staticmethod
     def validate_none_json_request(request: PredictionRequest) -> bool:
-        # Check if all fields of the request are None, return True
         return all(value is None for value in request.dict().values())
 
     @staticmethod

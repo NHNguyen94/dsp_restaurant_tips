@@ -13,7 +13,7 @@ class ProjectBaseModel(SQLModel):
 class Predictions(ProjectBaseModel, table=True):
     __tablename__ = "predictions"
     id: UUID = Field(primary_key=True, default_factory=uuid4)
-    file_path: str = Field(nullable=False, index=True)
+    file_path: str = Field(nullable=True, index=True)
     total_bill: float = Field(nullable=False)
     sex: str = Field(nullable=False)
     smoker: str = Field(nullable=False)
@@ -21,6 +21,25 @@ class Predictions(ProjectBaseModel, table=True):
     time: str = Field(nullable=False)
     size: int = Field(nullable=False)
     tip: float = Field(nullable=False)
+    prediction_source: str = Field(nullable=False)
+    predicted_at: datetime = Field(nullable=False, index=True)
+
+
+class DataIssues(ProjectBaseModel, table=True):
+    __tablename__ = "data_issues"
+    id: UUID = Field(primary_key=True, default_factory=uuid4)
+    file_path: str = Field(nullable=False, index=True)
+    evaluated_expectations: int = Field(nullable=False)
+    successful_expectations: int = Field(nullable=False)
+    unsuccessful_expectations: int = Field(nullable=False)
+    success_percent: float = Field(nullable=False)
+    missing_columns: str = Field(nullable=False)
+    missing_values: str = Field(nullable=False)
+    duplicated_rows: str = Field(nullable=False)
+    unknown_categorical_values: str = Field(nullable=False)
+    unknon_numeric_values: str = Field(nullable=False)
+    bad_csv_encoding: str = Field(nullable=False)
+    bad_csv_format: str = Field(nullable=False)
     created_at: datetime = Field(nullable=False, index=True)
 
 
