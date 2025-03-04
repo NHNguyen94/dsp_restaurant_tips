@@ -1,0 +1,6 @@
+total_bill,tip,sex,smoker,day,time,size
+16.99,1.01,Female,No,Sun,Dinner,2
+10.34,-1.66,Male,No,Sun,Drinks,3
+21.01,3.5,Male,No,Sun,Dinner,300
+23.680,3.31,Male,No,Sun,Lunch,2
+24.59,3.61,Non-binary,1,Sun,Lunch,4
