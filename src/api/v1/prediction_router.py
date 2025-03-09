@@ -20,7 +20,7 @@ db_service_manager = DatabaseServiceManager()
 
 
 def _parse_predictions_to_api_response(
-        predictions: List[Predictions],
+    predictions: List[Predictions],
 ) -> List[PredictionResponse]:
     responses = []
     for (prediction,) in predictions:
@@ -39,9 +39,9 @@ def _parse_predictions_to_api_response(
 
 @router.post("/predict", response_model=List[PredictionResponse])
 async def predict(
-        input_json: Annotated[PredictionRequest, Depends()] = None,
-        input_file: Annotated[UploadFile, File()] = None,
-        prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp"
+    input_json: Annotated[PredictionRequest, Depends()] = None,
+    input_file: Annotated[UploadFile, File()] = None,
+    prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp",
 ):
     if ValidationManager.validate_none_json_request(input_json) == False:
         df = api_request_parser.parse_request_to_df(input_json)

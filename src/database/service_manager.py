@@ -19,7 +19,9 @@ class DatabaseServiceManager:
             session.add(data_issues)
             session.commit()
 
-    def append_df_to_predictions(self, df_with_predictions: pd.DataFrame, prediction_source) -> None:
+    def append_df_to_predictions(
+        self, df_with_predictions: pd.DataFrame, prediction_source
+    ) -> None:
         with self.session as session:
             # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
             for _, row in df_with_predictions.iterrows():

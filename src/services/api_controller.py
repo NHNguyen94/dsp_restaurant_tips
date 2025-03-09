@@ -17,7 +17,9 @@ class ApiController:
     def __init__(self):
         self.url = os.getenv("API_URL")
 
-    def predict_with_file_manual_request(self, file_path: str, prediction_source: str) -> List[Dict]:
+    def predict_with_file_manual_request(
+        self, file_path: str, prediction_source: str
+    ) -> List[Dict]:
         host = "127.0.0.1:8000"
         # url = "/v1/prediction/predict"
         url = f"/v1/prediction/predict?prediction_source={prediction_source}"
