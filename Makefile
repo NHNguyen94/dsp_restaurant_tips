@@ -23,7 +23,10 @@ run-frontend:
 	streamlit run src/app/app.py
 
 split-dataset:
-	PYTHONPATH=. poetry run python src/services/data_pipelines/split_data.py 25
+	PYTHONPATH=. python src/services/split_data.py $(SPLIT_SIZE)
+
+# https://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make
+SPLIT_SIZE ?= 20
 
 pre-process-data:
 	PYTHONPATH=. python src/services/ml_pipelines/pre_processing.py
