@@ -17,7 +17,8 @@ class ApiController:
     def __init__(self):
         self.url = os.getenv("API_URL")
 
-    # the library `requests` did not work, therefore this method had to be built from scratch
+    # The library `requests` did not work, therefore this method had to be built from scratch
+    # It worked locally during unit test, but did not work when deployed to airflow
     # TODO: Try to use the `requests` library again with some modifications
     # No need async for this, it's bound by the database connection already
     def predict_with_file_manual_request(
