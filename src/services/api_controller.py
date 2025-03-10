@@ -17,11 +17,13 @@ class ApiController:
     def __init__(self):
         self.url = os.getenv("API_URL")
 
+    # the library `requests` did not work, therefore this method had to be built from scratch
+    # TODO: Try to use the `requests` library again with some modifications
+    # No need async for this, it's bound by the database connection already
     def predict_with_file_manual_request(
         self, file_path: str, prediction_source: str
     ) -> List[Dict]:
         host = "127.0.0.1:8000"
-        # url = "/v1/prediction/predict"
         url = f"/v1/prediction/predict?prediction_source={prediction_source}"
 
         boundary = str(uuid.uuid4())
