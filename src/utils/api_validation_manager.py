@@ -5,7 +5,7 @@ import pandas as pd
 from src.api.v1.models.prediction_request import PredictionRequest
 
 
-class ValidationManager:
+class APIValidationManager:
     @staticmethod
     def validate_none_json_request(request: PredictionRequest) -> bool:
         return all(value is None for value in request.dict().values())
@@ -26,5 +26,5 @@ class ValidationManager:
     @staticmethod
     def find_invalid_rows(df: pd.DataFrame) -> List:
         invalid_indices = []
-        invalid_indices.extend(ValidationManager._find_null_rows(df))
+        invalid_indices.extend(APIValidationManager._find_null_rows(df))
         return invalid_indices

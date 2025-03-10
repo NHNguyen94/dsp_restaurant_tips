@@ -11,7 +11,7 @@ from src.database.models import Predictions
 from src.database.service_manager import DatabaseServiceManager
 from src.services.ml_pipelines.inference import async_predict_response_with_features
 from src.utils.api_request_parser import ApiRequestParser
-from src.utils.validation_manager import ValidationManager
+from src.utils.api_validation_manager import APIValidationManager
 
 router = APIRouter(tags=["prediction"])
 
@@ -43,7 +43,7 @@ async def predict(
     input_file: Annotated[UploadFile, File()] = None,
     prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp",
 ):
-    if ValidationManager.validate_none_json_request(input_json) == False:
+    if APIValidationManager.validate_none_json_request(input_json) == False:
         df = api_request_parser.parse_request_to_df(input_json)
     elif input_file:
         df = await api_request_parser.parse_csv_to_df(input_file)
