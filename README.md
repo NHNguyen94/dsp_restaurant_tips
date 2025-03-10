@@ -6,7 +6,11 @@ pip install -r requirements.txt (The airflow inside poetry behaves differently w
 # To be able to run full unit tests and the demo, you need to:
 - Install docker
 - Run `docker compose up` in the project root directory
+- Run `run-backend`
+- Run `run-frontend`
+- Run `split-dataset` or `split-dataset SPLIT_SIZE=number of files you want to split` This is for the ingest pipeline
 - Host airflow locally (read below instruction for how)
+- Go to localhost:8080, log in with the credentials admin/admin, and turn on the ingestion_pipeline and prediction_pipeline
 
 # To init airflow:
 
@@ -65,3 +69,11 @@ Cmd to check and kill conflict ports:
 `lsof -i:8793`
 
 `kill -9 <PID>`
+
+# To run the unit tests:
+Run `unittest`
+
+# To retrain the ML model:
+Run `pre-process-data`
+
+Run `train-model`
