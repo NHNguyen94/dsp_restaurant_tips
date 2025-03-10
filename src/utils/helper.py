@@ -7,7 +7,7 @@ import yaml
 from src.utils.date_time_manager import DateTimeManager
 
 
-def load_configs(config_path) -> Dict:
+def load_yml_configs(config_path: str) -> Dict:
     with open(config_path, "r") as file:
         return yaml.safe_load(file)
 
