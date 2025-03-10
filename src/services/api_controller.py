@@ -27,6 +27,7 @@ class ApiController:
         url = f"/v1/prediction/predict?prediction_source={prediction_source}"
 
         boundary = str(uuid.uuid4())
+        # https://docs.python.org/3/library/io.html#io.BytesIO
         body = BytesIO()
 
         content_type, _ = mimetypes.guess_type(file_path)
@@ -51,6 +52,7 @@ class ApiController:
             "Content-Length": str(len(body.getvalue())),
         }
 
+        # https://docs.python.org/3/library/http.client.html#http.client.HTTPConnection
         connection = http.client.HTTPConnection(host)
         connection.request("POST", url, body.getvalue(), headers)
 
