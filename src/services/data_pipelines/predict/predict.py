@@ -31,7 +31,9 @@ def _parse_response(
 def run_predict_single_file(
     file_path: str, prediction_source: str
 ) -> List[Predictions]:
-    response = api_controller.predict_with_file_manual_request(file_path, prediction_source)
+    response = api_controller.predict_with_file_manual_request(
+        file_path, prediction_source
+    )
     return _parse_response(response, file_path, prediction_source)
 
 

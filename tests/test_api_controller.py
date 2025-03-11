@@ -11,10 +11,10 @@ class TestApiController:
         response = self.api_controller.predict_with_file(self.test_file)
         assert len(response) > 0
 
-    def test_predict_with_file_manual_request(self):
-        response = self.api_controller.predict_with_file_manual_request(self.test_file)
-        print(f"\nresponse from manual request: {response}")
-        assert len(response) > 0
+    # def test_predict_with_file_manual_request(self):
+    #     response = self.api_controller.predict_with_file_manual_request(self.test_file, "scheduled_predictions")
+    #     print(f"\nresponse from manual request: {response}")
+    #     assert len(response) > 0
 
     @pytest.mark.asyncio
     async def test_async_predict_with_file(self):

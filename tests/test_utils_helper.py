@@ -1,5 +1,5 @@
 from src.utils.configs_manager import ModelPathConfigs
-from src.utils.helper import load_configs, round_number, get_unique_id
+from src.utils.helper import load_yml_configs, round_number, get_unique_id
 from src.utils.date_time_manager import DateTimeManager
 
 
@@ -7,7 +7,7 @@ class TestUtilsHelper:
     date_time_manager = DateTimeManager()
 
     def test_load_configs(self):
-        configs = load_configs(ModelPathConfigs.PRE_PROCESSING_CONFIGS_PATH)
+        configs = load_yml_configs(ModelPathConfigs.PRE_PROCESSING_CONFIGS_PATH)
         assert configs is not None
         assert configs["transformations"] is not None
 

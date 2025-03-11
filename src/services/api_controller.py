@@ -17,12 +17,18 @@ class ApiController:
     def __init__(self):
         self.url = os.getenv("API_URL")
 
-    def predict_with_file_manual_request(self, file_path: str, prediction_source: str) -> List[Dict]:
+    # The library `requests` did not work, therefore this method had to be built from scratch
+    # It worked locally during unit test, but did not work when deployed to airflow
+    # TODO: Try to use the `requests` library again with some modifications
+    # No need async for this, it's bound by the database connection already
+    def predict_with_file_manual_request(
+        self, file_path: str, prediction_source: str
+    ) -> List[Dict]:
         host = "127.0.0.1:8000"
-        # url = "/v1/prediction/predict"
         url = f"/v1/prediction/predict?prediction_source={prediction_source}"
 
         boundary = str(uuid.uuid4())
+        # https://docs.python.org/3/library/io.html#io.BytesIO
         body = BytesIO()
 
         content_type, _ = mimetypes.guess_type(file_path)
@@ -47,6 +53,7 @@ class ApiController:
             "Content-Length": str(len(body.getvalue())),
         }
 
+        # https://docs.python.org/3/library/http.client.html#http.client.HTTPConnection
         connection = http.client.HTTPConnection(host)
         connection.request("POST", url, body.getvalue(), headers)
 
