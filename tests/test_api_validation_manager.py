@@ -12,4 +12,6 @@ class TestAPIValidationManager:
         non_none_request = PredictionRequest(
             total_bill=10.0, sex=None, smoker=None, day=None, time=None, size=None
         )
-        assert APIValidationManager.validate_none_json_request(non_none_request) == False
+        assert (
+            APIValidationManager.validate_none_json_request(non_none_request) == False
+        )
