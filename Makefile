@@ -28,6 +28,11 @@ split-dataset:
 # https://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make
 SPLIT_SIZE ?= 20
 
+create-false-data:
+	PYTHONPATH=. python src/services/create_false_data.py $(ROWS)
+
+ROWS ?= 10
+
 pre-process-data:
 	PYTHONPATH=. python src/services/ml_pipelines/pre_processing.py
 
