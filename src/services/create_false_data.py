@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 import pandas as pd
 
@@ -89,7 +87,25 @@ def create_false_and_correct_data(n: int) -> pd.DataFrame:
     return pd.concat([correct_data, false_data], ignore_index=True)
 
 
+def create_df_missing_column(n: int) -> pd.DataFrame:
+    df = _create_correct_data(n)
+    df_missing_col = df.drop(columns=["size"])
+    return df_missing_col
+
+
+def create_csv_with_custom_delimiter(n: int, delimiter: str, file_path: str) -> None:
+    df = create_false_and_correct_data(n)
+    df.to_csv(file_path, sep=delimiter, index=False)
+
+
+def main(n: int):
+    df_false_data = create_false_and_correct_data(n)
+    df_false_data.to_csv(f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_false_data.csv", index=False)
+    df_missing_col = create_df_missing_column(n)
+    df_missing_col.to_csv(f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_missing_columns.csv", index=False)
+    create_csv_with_custom_delimiter(n, "\t",
+                                     f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_custom_delimiter.csv")
+
+
 if __name__ == "__main__":
-    df = create_false_and_correct_data(int(sys.argv[1]))
-    file_name = get_unique_id()
-    df.to_csv(f"{data_path_configs.RAW_DATA_PATH}/{file_name}.csv", index=False)
+    main(int(10))
