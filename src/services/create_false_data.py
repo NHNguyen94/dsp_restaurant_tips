@@ -100,11 +100,20 @@ def create_csv_with_custom_delimiter(n: int, delimiter: str, file_path: str) -> 
 
 def main(n: int):
     df_false_data = create_false_and_correct_data(n)
-    df_false_data.to_csv(f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_false_data.csv", index=False)
+    df_false_data.to_csv(
+        f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_false_data.csv",
+        index=False,
+    )
     df_missing_col = create_df_missing_column(n)
-    df_missing_col.to_csv(f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_missing_columns.csv", index=False)
-    create_csv_with_custom_delimiter(n, "\t",
-                                     f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_custom_delimiter.csv")
+    df_missing_col.to_csv(
+        f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_missing_columns.csv",
+        index=False,
+    )
+    create_csv_with_custom_delimiter(
+        n,
+        "\t",
+        f"{data_path_configs.RAW_DATA_PATH}/{get_unique_id()}_custom_delimiter.csv",
+    )
 
 
 if __name__ == "__main__":

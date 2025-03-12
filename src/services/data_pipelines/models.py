@@ -48,15 +48,15 @@ class GXResultPerColumn:
 
 @dataclass
 class CSVResult:
-    bad_encoding: bool
-    bad_format: bool
+    encoding: bool
+    format: bool
 
 
 @dataclass
 class ValidatedResult:
     file_path: str
     overall_result: bool
-    overall_statistics: OverallStatistics
+    overall_statistics: OverallStatistics = None
     csv_results: CSVResult = None
     parsed_results_gx: List[GXResultPerColumn] = None
     docs_urls: List = None

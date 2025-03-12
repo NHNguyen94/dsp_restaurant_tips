@@ -57,6 +57,7 @@ class ModelConfigs:
 
 
 class DataConfigs:
+    DEFAULT_DELIMITER = ","
     EXPECTED_RESULTS_FOR_VALIDATION = {
         "total_bill": {"min": 0, "max": 1000000},
         "size": {"min": 0, "max": 50},
