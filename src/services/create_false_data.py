@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from src.utils.configs_manager import DataPathConfigs
+from utils.helper import get_unique_id
 
 data_path_configs = DataPathConfigs.get_configs()
 
@@ -90,4 +91,5 @@ def create_false_and_correct_data(n: int) -> pd.DataFrame:
 
 if __name__ == "__main__":
     df = create_false_and_correct_data(int(sys.argv[1]))
-    df.to_csv(data_path_configs.RAW_DATA_PATH)
+    file_name = get_unique_id()
+    df.to_csv(f"{data_path_configs.DATASET_PATH}/{file_name}.csv", index=False)
