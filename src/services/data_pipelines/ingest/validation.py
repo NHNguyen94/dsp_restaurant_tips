@@ -20,6 +20,7 @@ from src.services.data_pipelines.models import (
     ValidatedResult,
     GXResultPerColumn,
     GXResultNotNullDetails,
+    GXResultBeOfTypeDetails,
     GXResultBetweenOrInSetDetails,
     OverallStatistics,
     AllResults,
@@ -94,6 +95,7 @@ class ValidationService:
         stats = OverallStatistics(**input_results["statistics"])
 
         results = input_results["results"]
+        wrong_type_columns_to_ignore = []
         for res in results:
             expectation_config = res["expectation_config"]
             data_per_col = GXResultPerColumn(
@@ -106,15 +108,28 @@ class ValidationService:
                 data_per_col.all_results.result_column_exist = res["success"]
             if expectation_config["type"] == "expect_column_values_to_not_be_null":
                 data_per_col.all_results.result_not_null = GXResultNotNullDetails(
-                    **res["result"]
+                    **res["result"], result=res["success"]
+                )
+            if expectation_config["type"] == "expect_column_values_to_be_of_type":
+                if res["success"] == False:
+                    wrong_type_columns_to_ignore.append(
+                        expectation_config["kwargs"]["column"]
+                    )
+                data_per_col.all_results.result_be_of_type = GXResultBeOfTypeDetails(
+                    **res["result"], result=res["success"]
                 )
             if expectation_config["type"] in [
                 "expect_column_values_to_be_in_set",
                 "expect_column_values_to_be_between",
             ]:
-                data_per_col.all_results.result_between_or_in_set = (
-                    GXResultBetweenOrInSetDetails(**res["result"])
-                )
+                if expectation_config["kwargs"]["column"] in wrong_type_columns_to_ignore:
+                    continue
+                else:
+                    data_per_col.all_results.result_between_or_in_set = (
+                        GXResultBetweenOrInSetDetails(
+                            **res["result"], result=res["success"]
+                        )
+                    )
 
             parsed_results.append(data_per_col)
 
@@ -133,6 +148,11 @@ class ValidationService:
                         new_all_res.result_column_exist = (
                             res.all_results.result_column_exist
                         )
+                        final_success_for_column = (
+                            final_success_for_column and res.success
+                        )
+                    if res.all_results.result_be_of_type:
+                        new_all_res.result_be_of_type = res.all_results.result_be_of_type
                         final_success_for_column = (
                             final_success_for_column and res.success
                         )
@@ -174,8 +194,15 @@ class ValidationService:
         for k, v in self.expected_data.items():
             expectation_col = gx.expectations.ExpectColumnToExist(column=k)
             suite.add_expectation(expectation_col)
+
+            expectation_col_type = gx.expectations.ExpectColumnValuesToBeOfType(
+                column=k, type_=v["type"]
+            )
+            suite.add_expectation(expectation_col_type)
+
             expectation_value = gx.expectations.ExpectColumnValuesToNotBeNull(column=k)
             suite.add_expectation(expectation_value)
+
             if "min" in v and "max" in v:
                 expectation = gx.expectations.ExpectColumnValuesToBeBetween(
                     column=k, min_value=v["min"], max_value=v["max"]

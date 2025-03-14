@@ -14,6 +14,7 @@ class OverallStatistics:
 
 @dataclass
 class GXResultBetweenOrInSetDetails:
+    result: bool
     element_count: int
     unexpected_count: int
     unexpected_percent: float
@@ -26,6 +27,7 @@ class GXResultBetweenOrInSetDetails:
 
 @dataclass
 class GXResultNotNullDetails:
+    result: bool
     element_count: int
     unexpected_count: int
     unexpected_percent: float
@@ -33,9 +35,24 @@ class GXResultNotNullDetails:
 
 
 @dataclass
+class GXResultBeOfTypeDetails:
+    result: bool
+    observed_value: str = None # This only appears in float column, due to great expectation lib, and the other fields will be None
+    element_count: int = None
+    unexpected_count: int = None
+    unexpected_percent: float = None
+    partial_unexpected_list: List = None
+    missing_count: int = None
+    missing_percent: float = None
+    unexpected_percent_total: float = None
+    unexpected_percent_nonmissing: float = None
+
+
+@dataclass
 class AllResults:
     result_column_exist: bool = None
     result_not_null: GXResultNotNullDetails = None
+    result_be_of_type: GXResultBeOfTypeDetails = None
     result_between_or_in_set: GXResultBetweenOrInSetDetails = None
 
 

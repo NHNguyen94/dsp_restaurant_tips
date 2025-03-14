@@ -1,4 +1,4 @@
 total_bill,tip,sex,smoker,day,time,size
--1,1.01,Non-Binary,No,SunAndSat,Dinner,1
+1,1.01,Non-Binary,No,SunAndSat,Dinner,1
 10.34,1.66,Male,No,Sun,Dinner,10000
 21.01,3.5,Male,No,Sun,Dinner,3
