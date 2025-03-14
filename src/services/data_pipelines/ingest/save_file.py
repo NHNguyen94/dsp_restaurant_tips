@@ -23,7 +23,7 @@ def run_save_file(validated_result: ValidatedResult) -> None:
     file_name = validated_result.file_path.split("/")[-1]
     file_name = f"{file_name}_{get_unique_id()}.csv"
     # Only do in case csv is parsed properly
-    if validated_result.final_df:
+    if validated_result.csv_results.format or validated_result.csv_results.encoding:
         good_df, bad_df = _split_good_and_bad(validated_result.final_df)
         if not good_df.empty:
             _save_file(f"{data_path_configs.GOOD_DATA_PATH}/{file_name}", good_df)

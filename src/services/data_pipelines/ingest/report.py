@@ -59,5 +59,6 @@ def _parse_validated_results_to_data_issues(
 
 
 def run_save_statistics(validated_result: ValidatedResult) -> None:
-    data_issues = _parse_validated_results_to_data_issues(validated_result)
-    db_service_manager.append_data_issues(data_issues)
+    if validated_result.csv_results.format or validated_result.csv_results.encoding:
+        data_issues = _parse_validated_results_to_data_issues(validated_result)
+        db_service_manager.append_data_issues(data_issues)
