@@ -245,6 +245,7 @@ class ValidationService:
                 file_path=self.file_path,
                 overall_result=overall_result,
                 overall_statistics=stats,
+                csv_results=csv_result_validation,
                 parsed_results_gx=parsed_results,
                 docs_urls=docs_urls,
                 final_df=final_df,
