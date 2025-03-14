@@ -1,0 +1,21 @@
+total_bill,sex,smoker,day,time,size
+286.7309010309633,Male,No,Thur,Dinner,2
+9.113064805571724,Male,No,Thur,Lunch,1
+269.5392273148193,Female,No,Sat,Lunch,5
+464.2329811609962,Female,Yes,Thur,Lunch,8
+699.5095113493272,Male,No,Thur,Lunch,2
+739.1072475565857,Male,No,Fri,Dinner,9
+33.652580844523385,Female,No,Wed,Lunch,6
+988.5973663760325,Female,No,Thur,Lunch,4
+762.0874716727192,Female,Yes,Mon,Lunch,4
+663.4287210788591,Male,Yes,Mon,Dinner,9
+a,Non-Binary,Maybe,Weekend,Breakfast,one
+a,,Maybe Not,Weekday,Breakfast,one
+a,,Maybe Not,,Supper,one
+,Non-Binary,Maybe Not,Weekday,,
+,,Maybe Not,,Supper,
+,Non-Binary,Maybe Not,Weekday,Supper,two
+a,,Maybe,,Supper,two
+a,Unknown,,Weekday,Supper,
+a,Unknown,Maybe Not,,,one
+a,Unknown,Maybe Not,Weekday,Supper,two

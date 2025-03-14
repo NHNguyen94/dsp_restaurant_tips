@@ -118,13 +118,29 @@ class ValidationService:
                 data_per_col.all_results.result_be_of_type = GXResultBeOfTypeDetails(
                     **res["result"], result=res["success"]
                 )
+
+            parsed_results.append(data_per_col)
+
+        # Split to 2 for loops to validate the column first, then validate the value of the column
+        for res in results:
+            expectation_config = res["expectation_config"]
+            data_per_col = GXResultPerColumn(
+                success=res["success"],
+                column=expectation_config["kwargs"]["column"],
+                all_results=AllResults(),
+            )
             if expectation_config["type"] in [
                 "expect_column_values_to_be_in_set",
                 "expect_column_values_to_be_between",
             ]:
-                if expectation_config["kwargs"]["column"] in wrong_type_columns_to_ignore:
+                if (
+                    expectation_config["kwargs"]["column"]
+                    in wrong_type_columns_to_ignore
+                ):
                     continue
                 else:
+                    # print(f"wrong_type_columns_to_ignore: {wrong_type_columns_to_ignore}")
+                    # print(f"\n\n\nres: {res}\n\n\n")
                     data_per_col.all_results.result_between_or_in_set = (
                         GXResultBetweenOrInSetDetails(
                             **res["result"], result=res["success"]
@@ -152,7 +168,9 @@ class ValidationService:
                             final_success_for_column and res.success
                         )
                     if res.all_results.result_be_of_type:
-                        new_all_res.result_be_of_type = res.all_results.result_be_of_type
+                        new_all_res.result_be_of_type = (
+                            res.all_results.result_be_of_type
+                        )
                         final_success_for_column = (
                             final_success_for_column and res.success
                         )
@@ -174,9 +192,9 @@ class ValidationService:
             grouped_results.append(new_parsed_res)
 
         for data in grouped_results:
-            if (
-                data.all_results.result_column_exist is None
-                or data.all_results.result_not_null is None
+            if data.all_results.result_column_exist == False and (
+                data.all_results.result_not_null is None
+                or data.all_results.result_be_of_type is None
                 or data.all_results.result_between_or_in_set is None
             ):
                 raise ValueError("Missing validation category")
@@ -226,9 +244,22 @@ class ValidationService:
         filter_conditions = []
         for res in parsed_results:
             if res.success == False:
+                if (
+                    res.all_results.result_column_exist == False
+                    or res.all_results.result_be_of_type.result == False
+                ):
+                    remove_all_col = True
+                    values_to_remove = []
+                else:
+                    remove_all_col = False
+                    values_to_remove = (
+                        res.all_results.result_not_null.partial_unexpected_list
+                        + res.all_results.result_between_or_in_set.partial_unexpected_list
+                    )
                 filter = {
                     "column": res.column,
-                    "values_to_remove": res.all_results.result_between_or_in_set.partial_unexpected_list,
+                    "remove_all_rows": remove_all_col,
+                    "values_to_remove": values_to_remove,
                 }
                 filter_conditions.append(filter)
 
@@ -239,12 +270,17 @@ class ValidationService:
     ) -> pd.DataFrame:
         new_df = self.df.copy()
         filter_conditions = self._create_filter_conditions(parsed_results)
+        # print(f"\n\n\nfilter_conditions: {filter_conditions}\n\n\n")
         if len(filter_conditions) > 0:
             new_df["is_good"] = 1
             for filter in filter_conditions:
-                new_df.loc[
-                    new_df[filter["column"]].isin(filter["values_to_remove"]), "is_good"
-                ] = 0
+                if filter["remove_all_rows"]:
+                    new_df["is_good"] = 0
+                else:
+                    new_df.loc[
+                        new_df[filter["column"]].isin(filter["values_to_remove"]),
+                        "is_good",
+                    ] = 0
         else:
             new_df["is_good"] = 1
 

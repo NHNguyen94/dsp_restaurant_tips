@@ -37,7 +37,7 @@ class GXResultNotNullDetails:
 @dataclass
 class GXResultBeOfTypeDetails:
     result: bool
-    observed_value: str = None # This only appears in float column, due to great expectation lib, and the other fields will be None
+    observed_value: str = None  # This only appears in float column, due to great expectation lib, and the other fields will be None
     element_count: int = None
     unexpected_count: int = None
     unexpected_percent: float = None
