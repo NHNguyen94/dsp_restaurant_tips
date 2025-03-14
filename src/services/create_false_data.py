@@ -94,7 +94,7 @@ def create_df_missing_column(n: int) -> pd.DataFrame:
 
 
 def create_csv_with_custom_delimiter(n: int, delimiter: str, file_path: str) -> None:
-    df = create_false_and_correct_data(n)
+    df = _create_correct_data(n)
     df.to_csv(file_path, sep=delimiter, index=False)
 
 
