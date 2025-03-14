@@ -4,11 +4,14 @@ Create conda env with python = 3.9 (The most stable version for airflow)
 pip install -r requirements.txt (The airflow inside poetry behaves differently with the airflow installed by pip)
 
 # To be able to run full unit tests and the demo, you need to:
+- Download this dataset: https://www.kaggle.com/datasets/saurabhbadole/restaurant-tips-dataset
+- Copy and rename the downloaded dataset to: src/data/tips.csv
 - Install docker
 - Run `docker compose up` in the project root directory
 - Run `run-backend`
 - Run `run-frontend`
-- Run `split-dataset` or `split-dataset SPLIT_SIZE=number of files you want to split` This is for the ingest pipeline
+- Run `split-dataset` or `split-dataset SPLIT_SIZE=number of files you want to split` This is to split the downloaded kaggle dataset for the ingest pipeline
+- Run `create-false-data` This is to create the false data for the ingest pipeline
 - Host airflow locally (read below instruction for how)
 - Go to localhost:8080, log in with the credentials admin/admin, and turn on the ingestion_pipeline and prediction_pipeline
 

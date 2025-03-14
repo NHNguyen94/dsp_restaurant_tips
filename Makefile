@@ -29,9 +29,7 @@ split-dataset:
 SPLIT_SIZE ?= 20
 
 create-false-data:
-	PYTHONPATH=. python src/services/create_false_data.py $(ROWS)
-
-ROWS ?= 10
+	PYTHONPATH=. python src/services/create_false_data.py
 
 pre-process-data:
 	PYTHONPATH=. python src/services/ml_pipelines/pre_processing.py

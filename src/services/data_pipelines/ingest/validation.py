@@ -23,6 +23,7 @@ from src.services.data_pipelines.models import (
     GXResultBetweenOrInSetDetails,
     OverallStatistics,
     AllResults,
+    CSVResult
 )
 from src.utils.configs_manager import DataConfigs
 from src.utils.csv_parser import CSVParser
@@ -37,6 +38,19 @@ class ValidationService:
         self.df = self.parser.read_csv_from_file_path(self.file_path)
         self.expected_data = DataConfigs.EXPECTED_RESULTS_FOR_VALIDATION
         self.context = gx.get_context()
+        self.default_delimiter = DataConfigs.DEFAULT_DELIMITER
+
+    def _validate_csv_delimiter(self) -> bool:
+        return self.parser.validate_if_default_delimiter(self.file_path)
+
+    def _validate_csv_encoding(self) -> bool:
+        return self.parser.validate_if_default_encoding(self.file_path)
+
+    def validate_csv(self) -> CSVResult:
+        return CSVResult(
+            encoding=self._validate_csv_encoding(),
+            format=self._validate_csv_delimiter(),
+        )
 
     def _get_gx_batch(self) -> Batch:
         data_source = self.context.data_sources.add_pandas(name="data")
@@ -52,8 +66,8 @@ class ValidationService:
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     def _build_datadocs_urls(
-        self,
-        results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
+            self,
+            results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
     ) -> List:
         suite_identifier = ExpectationSuiteIdentifier(
             name=results.meta["expectation_suite_name"]
@@ -70,10 +84,10 @@ class ValidationService:
         return docs_urls
 
     def _parse_results_from_validator(
-        self,
-        input_results: Union[
-            ExpectationValidationResult, ExpectationSuiteValidationResult
-        ],
+            self,
+            input_results: Union[
+                ExpectationValidationResult, ExpectationSuiteValidationResult
+            ],
     ) -> (List[GXResultPerColumn], bool, OverallStatistics):
         parsed_results = []
         overall_result = input_results["success"]
@@ -107,7 +121,7 @@ class ValidationService:
         return (parsed_results, overall_result, stats)
 
     def group_by_parsed_results_by_column(
-        self, parsed_results: List[GXResultPerColumn]
+            self, parsed_results: List[GXResultPerColumn]
     ) -> List[GXResultPerColumn]:
         grouped_results = []
         for col in self.expected_data.keys():
@@ -120,19 +134,19 @@ class ValidationService:
                             res.all_results.result_column_exist
                         )
                         final_success_for_column = (
-                            final_success_for_column and res.success
+                                final_success_for_column and res.success
                         )
                     if res.all_results.result_not_null:
                         new_all_res.result_not_null = res.all_results.result_not_null
                         final_success_for_column = (
-                            final_success_for_column and res.success
+                                final_success_for_column and res.success
                         )
                     if res.all_results.result_between_or_in_set:
                         new_all_res.result_between_or_in_set = (
                             res.all_results.result_between_or_in_set
                         )
                         final_success_for_column = (
-                            final_success_for_column and res.success
+                                final_success_for_column and res.success
                         )
             new_parsed_res = GXResultPerColumn(
                 success=final_success_for_column, column=col, all_results=new_all_res
@@ -141,16 +155,16 @@ class ValidationService:
 
         for data in grouped_results:
             if (
-                data.all_results.result_column_exist is None
-                or data.all_results.result_not_null is None
-                or data.all_results.result_between_or_in_set is None
+                    data.all_results.result_column_exist is None
+                    or data.all_results.result_not_null is None
+                    or data.all_results.result_between_or_in_set is None
             ):
                 raise ValueError("Missing validation category")
 
         return grouped_results
 
     def validate_columns_with_validator(
-        self,
+            self,
     ) -> Union[ExpectationValidationResult, ExpectationSuiteValidationResult]:
         validator = self._get_gx_validator()
         suite_name = "validation_suite"
@@ -180,7 +194,7 @@ class ValidationService:
         return validator.validate(suite)
 
     def _create_filter_conditions(
-        self, parsed_results: List[GXResultPerColumn]
+            self, parsed_results: List[GXResultPerColumn]
     ) -> List:
         filter_conditions = []
         for res in parsed_results:
@@ -194,7 +208,7 @@ class ValidationService:
         return filter_conditions
 
     def _make_df_with_is_good_col(
-        self, parsed_results: List[GXResultPerColumn]
+            self, parsed_results: List[GXResultPerColumn]
     ) -> pd.DataFrame:
         new_df = self.df.copy()
         filter_conditions = self._create_filter_conditions(parsed_results)
@@ -210,22 +224,32 @@ class ValidationService:
         return new_df
 
     def validate_data(self) -> ValidatedResult:
-        validated_result = self.validate_columns_with_validator()
-        docs_urls = self._build_datadocs_urls(validated_result)
-        (parsed_results, overall_result, stats) = self._parse_results_from_validator(
-            validated_result
-        )
-        parsed_results = self.group_by_parsed_results_by_column(parsed_results)
-        # print(f"\n\n\nparsed_results: {parsed_results}\n\n\n")
-        final_df = self._make_df_with_is_good_col(parsed_results)
-        return ValidatedResult(
-            file_path=self.file_path,
-            overall_result=overall_result,
-            overall_statistics=stats,
-            parsed_results_gx=parsed_results,
-            docs_urls=docs_urls,
-            final_df=final_df,
-        )
+        csv_result_validation = self.validate_csv()
+        if csv_result_validation.format == False or csv_result_validation.encoding == False:
+            return ValidatedResult(
+                file_path=self.file_path,
+                overall_result=False,
+                csv_results=csv_result_validation,
+            )
+
+        else:
+            validated_result = self.validate_columns_with_validator()
+            docs_urls = self._build_datadocs_urls(validated_result)
+            (parsed_results, overall_result, stats) = self._parse_results_from_validator(
+                validated_result
+            )
+            parsed_results = self.group_by_parsed_results_by_column(parsed_results)
+            # print(f"\n\n\nparsed_results: {parsed_results}\n\n\n")
+            final_df = self._make_df_with_is_good_col(parsed_results)
+            return ValidatedResult(
+                file_path=self.file_path,
+                overall_result=overall_result,
+                overall_statistics=stats,
+                csv_results=csv_result_validation,
+                parsed_results_gx=parsed_results,
+                docs_urls=docs_urls,
+                final_df=final_df,
+            )
 
 
 def run_validate_data(file_path: str, batch_definition: str) -> ValidatedResult:

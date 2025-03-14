@@ -18,9 +18,9 @@ def _parse_validated_results_to_data_issues(
     bad_csv_format = 0
 
     if validated_result.csv_results is not None:
-        if validated_result.csv_results.bad_encoding:
+        if validated_result.csv_results.encoding:
             bad_csv_encoding += 1
-        if validated_result.csv_results.bad_format:
+        if validated_result.csv_results.format:
             bad_csv_format += 1
 
     parsed_results_gx = validated_result.parsed_results_gx
