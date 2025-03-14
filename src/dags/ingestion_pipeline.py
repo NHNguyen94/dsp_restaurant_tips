@@ -37,7 +37,9 @@ def ingestion_pipeline():
 
     @task
     def build_validate(file_path: str) -> ValidatedResult:
-        return run_validate_data(file_path, "batch for ingestion pipeline")
+        validated_result = run_validate_data(file_path, "batch for ingestion pipeline")
+        logging.debug(f"validated_result: {validated_result}")
+        return validated_result
 
     @task
     def build_alert(validated_result: ValidatedResult) -> None:

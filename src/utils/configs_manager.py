@@ -57,7 +57,9 @@ class ModelConfigs:
 
 
 class DataConfigs:
+    DEFAULT_DECODER = "utf-8"
     DEFAULT_DELIMITER = ","
+    ACCEPTED_ENCODINGS = ["utf-8", "ascii"]
     EXPECTED_RESULTS_FOR_VALIDATION = {
         "total_bill": {"min": 0, "max": 1000000},
         "size": {"min": 0, "max": 50},
