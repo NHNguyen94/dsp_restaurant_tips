@@ -9,12 +9,12 @@ total_bill,sex,smoker,day,time,size
 988.5973663760325,Female,No,Thur,Lunch,4
 762.0874716727192,Female,Yes,Mon,Lunch,4
 663.4287210788591,Male,Yes,Mon,Dinner,9
-a,Non-Binary,Maybe,Weekend,Breakfast,one
+a,Non-Binary,Maybe,4,Breakfast,one
 a,,Maybe Not,Weekday,Breakfast,one
 a,,Maybe Not,,Supper,one
-,Non-Binary,Maybe Not,Weekday,,
+,Non-Binary,Maybe Not,5,,
 ,,Maybe Not,,Supper,
-,Non-Binary,Maybe Not,Weekday,Supper,two
+,Non-Binary,Maybe Not,6,Supper,two
 a,,Maybe,,Supper,two
 a,Unknown,,Weekday,Supper,
 a,Unknown,Maybe Not,,,one

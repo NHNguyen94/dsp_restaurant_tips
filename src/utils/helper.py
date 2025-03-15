@@ -1,10 +1,9 @@
 import subprocess
 import uuid
-from typing import Dict
+from typing import Dict, List
 
+import pandas as pd
 import yaml
-
-from src.utils.date_time_manager import DateTimeManager
 
 
 def load_yml_configs(config_path: str) -> Dict:
@@ -21,8 +20,34 @@ def get_current_user() -> str:
 
 
 def get_unique_id() -> str:
-    return (
-        str(uuid.uuid4())
-        + "_"
-        + DateTimeManager.get_current_local_time_str().replace(" ", "_")
-    )
+    return str(uuid.uuid4())
+
+
+def is_number(value: str) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+
+def remove_numerical_values(list_values: List) -> List:
+    new_list = [x for x in list_values if not is_number(x)]
+    return [str(x) for x in new_list] if new_list else []
+
+
+def remove_non_numerical_values(list_values: List) -> List:
+    new_list = [x for x in list_values if is_number(x)]
+    return [float(x) for x in new_list] if new_list else []
+
+
+def find_non_numerical_values_in_df(df: pd.DataFrame, col: str) -> List[str]:
+    new_df = df.copy()
+    new_df = new_df.dropna(subset=[col])
+    return new_df[~new_df[col].apply(lambda x: is_number(x))][col].tolist()
+
+
+def find_numerical_values_in_df(df: pd.DataFrame, col: str) -> List[str]:
+    new_df = df.copy()
+    new_df = new_df.dropna(subset=[col])
+    return new_df[new_df[col].apply(lambda x: is_number(x))][col].tolist()
