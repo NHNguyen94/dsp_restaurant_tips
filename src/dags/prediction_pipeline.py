@@ -15,7 +15,7 @@ from src.services.data_pipelines.predict import run_predictions, check_new_data
     description="Prediction pipeline",
     tags=["prediction"],
     schedule_interval=datetime.timedelta(seconds=60),
-    start_date=days_ago(n=0, hour=1),
+    start_date=days_ago(1, hour=23, minute=55),
     max_active_runs=1,
     catchup=False,
 )

@@ -57,12 +57,17 @@ class ModelConfigs:
 
 
 class DataConfigs:
+    DEFAULT_DECODER = "utf-8"
     DEFAULT_DELIMITER = ","
+    ACCEPTED_ENCODINGS = ["utf-8", "ascii"]
     EXPECTED_RESULTS_FOR_VALIDATION = {
-        "total_bill": {"min": 0, "max": 1000000},
-        "size": {"min": 0, "max": 50},
-        "sex": {"accept": ("Male", "Female")},
-        "smoker": {"accept": ("Yes", "No")},
-        "day": {"accept": ("Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun")},
-        "time": {"accept": ("Lunch", "Dinner")},
+        "total_bill": {"min": 0, "max": 1000000, "type": "float"},
+        "size": {"min": 0, "max": 50, "type": "int"},
+        "sex": {"accept": ("Male", "Female"), "type": "str"},
+        "smoker": {"accept": ("Yes", "No"), "type": "str"},
+        "day": {
+            "accept": ("Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"),
+            "type": "str",
+        },
+        "time": {"accept": ("Lunch", "Dinner"), "type": "str"},
     }
