@@ -28,7 +28,7 @@ class TestValidationService:
             self.failed_test_csv_path, "failed batch"
         )
         result = validation_service.validate_data()
-        pprint(f"\nresult_failed_test_validate_data_1: {result}")
+        # pprint(f"\nresult_failed_test_validate_data_1: {result}")
         df = result.final_df
         total_good_cols = df["is_good"].sum()
         assert isinstance(result, ValidatedResult)
@@ -36,10 +36,10 @@ class TestValidationService:
 
     def test_fail_validate_data_2(self):
         validation_service = ValidationService(
-            "/Users/nguyennguyen/Desktop/github_repos/personal/dsp_restaurant_tips/tests/resources/failed_test_tips_2.csv", "failed batch"
+            self.failed_test_csv_path_2, "failed batch"
         )
         result = validation_service.validate_data()
-        pprint(f"\nresult_failed_test_validate_data_2: {result}")
+        # pprint(f"\nresult_failed_test_validate_data_2: {result}")
         df = result.final_df
         total_good_cols = df["is_good"].sum()
         assert isinstance(result, ValidatedResult)
@@ -50,7 +50,7 @@ class TestValidationService:
             self.passed_test_csv_path, "passed batch"
         )
         result = validation_service.validate_data()
-        pprint(f"\nresult_passed_test_validate_data: {result}")
+        # pprint(f"\nresult_passed_test_validate_data: {result}")
         df = result.final_df
         total_good_cols = df["is_good"].sum()
         assert isinstance(result, ValidatedResult)
