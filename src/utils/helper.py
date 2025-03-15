@@ -1,7 +1,8 @@
 import subprocess
 import uuid
-from typing import Dict
+from typing import Dict, List
 
+import pandas as pd
 import yaml
 
 
@@ -20,3 +21,19 @@ def get_current_user() -> str:
 
 def get_unique_id() -> str:
     return str(uuid.uuid4())
+
+
+def is_number(value: str) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+
+def find_non_numerical_values_in_df(df: pd.DataFrame, col: str) -> List[str]:
+    return df[~df[col].apply(lambda x: is_number(x))][col].unique().tolist()
+
+
+def find_numerical_values_in_df(df: pd.DataFrame, col: str) -> List[str]:
+    return df[df[col].apply(lambda x: is_number(x))][col].unique().tolist()

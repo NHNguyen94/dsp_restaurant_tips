@@ -1,6 +1,14 @@
+import pandas as pd
+
 from src.utils.configs_manager import ModelPathConfigs
-from src.utils.helper import load_yml_configs, round_number, get_unique_id
 from src.utils.date_time_manager import DateTimeManager
+from src.utils.helper import (
+    load_yml_configs,
+    round_number,
+    get_unique_id,
+    find_non_numerical_values_in_df,
+    find_numerical_values_in_df,
+)
 
 
 class TestUtilsHelper:
@@ -28,3 +36,13 @@ class TestUtilsHelper:
         assert parsed_date.month == 1
         assert parsed_date.day == 1
         assert str(parsed_date) == "2021-01-01"
+
+    def test_find_non_numerical_values_in_df(self):
+        df = pd.DataFrame({"col": ["1", "2.2", "3.3.3", "a", "b", "c"]})
+        non_numerical_values = find_non_numerical_values_in_df(df, "col")
+        assert non_numerical_values == ["3.3.3", "a", "b", "c"]
+
+    def test_find_numerical_values_in_df(self):
+        df = pd.DataFrame({"col": ["1", "2.2", "3.3.3", "a", "b", "c"]})
+        numerical_values = find_numerical_values_in_df(df, "col")
+        assert numerical_values == ["1", "2.2"]
