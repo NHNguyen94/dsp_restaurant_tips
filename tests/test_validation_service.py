@@ -12,7 +12,7 @@ class TestValidationService:
             self.failed_test_csv_path, "failed batch"
         )
         result = validation_service.validate_columns_with_validator()
-        print(f"\nresult_test_validate_columns_with_validator: {result}")
+        # print(f"\nresult_validate_columns_with_validator: {result}")
 
     def test_fail_validate_data_1(self):
         validation_service = ValidationService(
