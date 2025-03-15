@@ -23,6 +23,7 @@ def _load_model_by_joblib() -> XGBRegressor:
     model = joblib.load(model_path_configs.MODEL_PATH)
     return model
 
+
 def predict(df: pd.DataFrame) -> np.ndarray:
     # model = _load_model()
     # dmatrix = DMatrix(df)
