@@ -38,12 +38,9 @@ def ingestion_pipeline():
 
     @task
     def build_validate(file_path: str) -> ValidatedResult:
-<<<<<<< HEAD
-=======
         df = csv_parser.read_csv_from_file_path(file_path)
         if len(df) == 0:
             raise AirflowSkipException("Empty dataframe")
->>>>>>> main
         validated_result = run_validate_data(file_path, "batch for ingestion pipeline")
         logging.debug(f"validated_result: {validated_result}")
         return validated_result
