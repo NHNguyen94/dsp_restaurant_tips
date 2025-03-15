@@ -25,14 +25,19 @@ from src.services.data_pipelines.models import (
     OverallStatistics,
     AllResults,
     CSVResult,
+    FailureMode,
+    FailureModePerColumn,
 )
-from src.utils.configs_manager import DataConfigs
+from src.utils.configs_manager import QualityConfigs, DataConfigs
 from src.utils.csv_parser import CSVParser
 from src.utils.date_time_manager import DateTimeManager
 from src.utils.helper import (
     find_numerical_values_in_df,
     find_non_numerical_values_in_df,
 )
+
+data_configs = DataConfigs()
+quality_configs = QualityConfigs()
 
 
 class ValidationService:
@@ -42,20 +47,22 @@ class ValidationService:
         self.parser = CSVParser()
         self.df = self.parser.read_csv_from_file_path(self.file_path)
         self.df_after_validate_dtype = self.df.copy()
-        self.expected_data = DataConfigs.EXPECTED_RESULTS_FOR_VALIDATION
+        self.expected_data = data_configs.EXPECTED_RESULTS_FOR_VALIDATION
         self.context = gx.get_context()
-        self.default_delimiter = DataConfigs.DEFAULT_DELIMITER
+        self.default_delimiter = data_configs.DEFAULT_DELIMITER
 
-    def _validate_csv_delimiter(self) -> bool:
-        return self.parser.validate_if_default_delimiter(self.file_path)
+    def _validate_csv(self) -> CSVResult:
+        encoding = self.parser.validate_if_default_encoding(self.file_path)
+        format = self.parser.validate_if_default_delimiter(self.file_path)
+        if encoding and format:
+            empty_file = self.parser.validate_if_empty_file(self.file_path)
+        else:
+            empty_file = None
 
-    def _validate_csv_encoding(self) -> bool:
-        return self.parser.validate_if_default_encoding(self.file_path)
-
-    def validate_csv(self) -> CSVResult:
         return CSVResult(
-            encoding=self._validate_csv_encoding(),
-            format=self._validate_csv_delimiter(),
+            encoding=encoding,
+            format=format,
+            empty_file=empty_file,
         )
 
     def _get_gx_batch(self, df: pd.DataFrame) -> Batch:
@@ -64,11 +71,13 @@ class ValidationService:
         batch_def = data_asset.add_batch_definition_whole_dataframe(
             self.batch_definition
         )
+
         return batch_def.get_batch(batch_parameters={"dataframe": df})
 
     # https://github.com/great-expectations/great_expectations/blob/develop/tests/validator/test_validator.py
     def _get_gx_validator(self, df: pd.DataFrame) -> Validator:
         batch = self._get_gx_batch(df)
+
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     def _build_datadocs_urls(
@@ -161,7 +170,7 @@ class ValidationService:
 
         return (parsed_results, overall_result, stats)
 
-    def group_by_parsed_results_by_column(
+    def _group_by_parsed_results_by_column(
         self, parsed_results: List[GXResultPerColumn]
     ) -> List[GXResultPerColumn]:
         grouped_results = []
@@ -223,7 +232,9 @@ class ValidationService:
             expectation_col = gx.expectations.ExpectColumnToExist(column=k)
             suite.add_expectation(expectation_col)
 
-            # Disabled to replace by the manual check in func validate_columns_dtype
+            # Disabled since it's replace by the manual check in func validate_columns_dtype
+            # The issue is that ExpectColumnValuesToBeOfType cannot recognize the case that the column has both number and string
+            # Because pandas automatically converts the column to string => All the values are string and fail the validation
             # expectation_col_type = gx.expectations.ExpectColumnValuesToBeOfType(
             #     column=k, type_=v["type"]
             # )
@@ -283,17 +294,17 @@ class ValidationService:
         filter_conditions = self._create_filter_conditions(parsed_results)
         # print(f"\n\n\nfilter_conditions: {filter_conditions}\n\n\n")
         if len(filter_conditions) > 0:
-            new_df["is_good"] = 1
+            new_df[quality_configs.IS_GOOD] = 1
             for filter in filter_conditions:
                 if filter["remove_all_rows"]:
-                    new_df["is_good"] = 0
+                    new_df[quality_configs.IS_GOOD] = 0
                 else:
                     new_df.loc[
                         new_df[filter["column"]].isin(filter["values_to_remove"]),
-                        "is_good",
+                        quality_configs.IS_GOOD,
                     ] = 0
         else:
-            new_df["is_good"] = 1
+            new_df[quality_configs.IS_GOOD] = 1
 
         return new_df
 
@@ -347,22 +358,78 @@ class ValidationService:
 
         return validated_result_for_check_col_type
 
+    def _parse_failure_modes(
+        self, parsed_results: List[GXResultPerColumn]
+    ) -> List[FailureModePerColumn]:
+        failure_modes_all_columns = []
+        for res in parsed_results:
+            if res.success == False:
+                if res.all_results.result_column_exist == False:
+                    failure_mode = FailureMode(
+                        failure_mode=QualityConfigs.COLUMN_NOT_EXIST,
+                        count=1,
+                    )
+                    failure_modes_all_columns.append(
+                        FailureModePerColumn(
+                            column=res.column, failure_mode=failure_mode
+                        )
+                    )
+                if res.all_results.result_not_null:
+                    failure_mode = FailureMode(
+                        failure_mode=QualityConfigs.NULL_VALUE,
+                        count=res.all_results.result_not_null.unexpected_count,
+                    )
+                    failure_modes_all_columns.append(
+                        FailureModePerColumn(
+                            column=res.column, failure_mode=failure_mode
+                        )
+                    )
+                if res.all_results.result_be_of_type:
+                    failure_mode = FailureMode(
+                        failure_mode=QualityConfigs.WRONG_DATA_TYPE,
+                        count=res.all_results.result_be_of_type.unexpected_count,
+                    )
+                    failure_modes_all_columns.append(
+                        FailureModePerColumn(
+                            column=res.column, failure_mode=failure_mode
+                        )
+                    )
+                if res.all_results.result_between_or_in_set:
+                    failure_mode = FailureMode(
+                        failure_mode=QualityConfigs.OUT_OF_RANGE,
+                        count=res.all_results.result_between_or_in_set.unexpected_count,
+                    )
+                    failure_modes_all_columns.append(
+                        FailureModePerColumn(
+                            column=res.column, failure_mode=failure_mode
+                        )
+                    )
+
+        return failure_modes_all_columns
+
     def _enrich_stats(
-        self, stats: OverallStatistics, final_df: pd.DataFrame
+        self,
+        stats: OverallStatistics,
+        final_df: pd.DataFrame,
+        parsed_results: List[GXResultPerColumn],
     ) -> OverallStatistics:
+        failure_modes_all_columns = self._parse_failure_modes(parsed_results)
         rows_count = len(final_df)
-        bad_rows_count = len(final_df[final_df["is_good"] == 0])
+        bad_rows_count = len(final_df[final_df[quality_configs.IS_GOOD] == 0])
         bad_rows_percent = bad_rows_count / rows_count * 100
         stats.rows_count = rows_count
         stats.bad_rows_count = bad_rows_count
         stats.bad_rows_percent = bad_rows_percent
+        stats.failure_modes = failure_modes_all_columns
+
         return stats
 
     def validate_data(self) -> ValidatedResult:
-        csv_result_validation = self.validate_csv()
+        csv_result_validation = self._validate_csv()
         if (
             csv_result_validation.format == False
             or csv_result_validation.encoding == False
+            or csv_result_validation.empty_file == True
         ):
             return ValidatedResult(
                 file_path=self.file_path,
@@ -373,7 +440,6 @@ class ValidationService:
         else:
             validated_result_for_check_col_type = self.validate_columns_dtype()
             self._cast_dtype_df_after_check_dtype()
-            print(self.df_after_validate_dtype)
             validated_result_no_check_col_type = self.validate_columns_with_validator()
             docs_urls = self._build_datadocs_urls(validated_result_no_check_col_type)
             (parsed_results, overall_result, stats) = (
@@ -382,10 +448,9 @@ class ValidationService:
                     validated_result_for_check_col_type,
                 )
             )
-            parsed_results = self.group_by_parsed_results_by_column(parsed_results)
-            # print(f"\n\n\nparsed_results: {parsed_results}\n\n\n")
+            parsed_results = self._group_by_parsed_results_by_column(parsed_results)
             final_df = self._make_df_with_is_good_col(parsed_results)
-            stats = self._enrich_stats(stats, final_df)
+            stats = self._enrich_stats(stats, final_df, parsed_results)
             return ValidatedResult(
                 file_path=self.file_path,
                 overall_result=overall_result,

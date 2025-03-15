@@ -71,3 +71,11 @@ class DataConfigs:
         },
         "time": {"accept": ("Lunch", "Dinner"), "type": "str"},
     }
+
+
+class QualityConfigs:
+    IS_GOOD = "is_good"
+    COLUMN_NOT_EXIST = "column_not_exist"
+    NULL_VALUE = "null_value"
+    WRONG_DATA_TYPE = "wrong_data_type"
+    OUT_OF_RANGE = "out_of_range"

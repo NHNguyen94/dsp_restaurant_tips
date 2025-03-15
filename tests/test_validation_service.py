@@ -2,6 +2,9 @@ from pprint import pprint
 
 from src.services.data_pipelines.ingest.validation import ValidationService
 from src.services.data_pipelines.models import ValidatedResult
+from src.utils.configs_manager import QualityConfigs
+
+quality_configs = QualityConfigs()
 
 
 class TestValidationService:
@@ -30,7 +33,7 @@ class TestValidationService:
         result = validation_service.validate_data()
         # pprint(f"\nresult_failed_test_validate_data_1: {result}")
         df = result.final_df
-        total_good_cols = df["is_good"].sum()
+        total_good_cols = df[quality_configs.IS_GOOD].sum()
         assert isinstance(result, ValidatedResult)
         assert total_good_cols == 1
 
@@ -41,7 +44,7 @@ class TestValidationService:
         result = validation_service.validate_data()
         # pprint(f"\nresult_failed_test_validate_data_2: {result}")
         df = result.final_df
-        total_good_cols = df["is_good"].sum()
+        total_good_cols = df[quality_configs.IS_GOOD].sum()
         assert isinstance(result, ValidatedResult)
         assert total_good_cols == 10
 
@@ -52,6 +55,6 @@ class TestValidationService:
         result = validation_service.validate_data()
         # pprint(f"\nresult_passed_test_validate_data: {result}")
         df = result.final_df
-        total_good_cols = df["is_good"].sum()
+        total_good_cols = df[quality_configs.IS_GOOD].sum()
         assert isinstance(result, ValidatedResult)
         assert total_good_cols == 3
