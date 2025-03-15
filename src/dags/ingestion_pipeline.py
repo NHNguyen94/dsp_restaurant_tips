@@ -25,7 +25,7 @@ from airflow.utils.dates import days_ago
     dag_id="ingestion_pipeline",
     description="Ingestion pipeline",
     tags=["ingestion"],
-    schedule_interval=datetime.timedelta(seconds=30),
+    schedule_interval=datetime.timedelta(seconds=60),
     start_date=days_ago(n=0, hour=1),
     max_active_runs=1,
     catchup=False,
