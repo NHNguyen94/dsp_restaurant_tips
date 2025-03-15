@@ -256,9 +256,7 @@ class ValidationService:
         for res in parsed_results:
             if res.success == False:
                 if (
-                        res.all_results.result_column_exist == False
-                        or res.all_results.result_be_of_type.result == False
-                ):
+                        res.all_results.result_column_exist == False):  # Add on here for further error mode to remove all rows
                     remove_all_col = True
                     values_to_remove = []
                 else:
@@ -266,6 +264,7 @@ class ValidationService:
                     values_to_remove = (
                             res.all_results.result_not_null.partial_unexpected_list
                             + res.all_results.result_between_or_in_set.partial_unexpected_list
+                            + res.all_results.result_be_of_type.partial_unexpected_list
                     )
                 filter = {
                     "column": res.column,
@@ -299,7 +298,13 @@ class ValidationService:
 
     def _cast_dtype_df_after_check_dtype(self):
         for k, v in self.expected_data.items():
-            self.df_after_validate_dtype[k] = self.df_after_validate_dtype[k].astype(v["type"])
+            if v["type"] in ["float", "int"]:
+                self.df_after_validate_dtype[k] = pd.to_numeric(
+                    self.df_after_validate_dtype[k], errors="ignore"
+                    # ignore to keep the NaN value for later validation
+                )
+            else:
+                self.df_after_validate_dtype[k] = self.df_after_validate_dtype[k].astype(v["type"])
 
     def validate_columns_dtype(self) -> List[GXResultPerColumn]:
         validated_result_for_check_col_type = []
@@ -311,7 +316,6 @@ class ValidationService:
                 partial_unexpected_list = find_numerical_values_in_df(self.df, k)
             else:
                 partial_unexpected_list = []
-            print(f"partial_unexpected_list: {partial_unexpected_list} for col: {k}")
             unexpected_count = len(partial_unexpected_list)
             unexpected_percent = unexpected_count / element_count * 100
             if len(partial_unexpected_list) > 0:
@@ -339,6 +343,15 @@ class ValidationService:
 
         return validated_result_for_check_col_type
 
+    def _enrich_stats(self, stats: OverallStatistics, final_df: pd.DataFrame) -> OverallStatistics:
+        rows_count = len(final_df)
+        bad_rows_count = len(final_df[final_df["is_good"] == 0])
+        bad_rows_percent = bad_rows_count / rows_count * 100
+        stats.rows_count = rows_count
+        stats.bad_rows_count = bad_rows_count
+        stats.bad_rows_percent = bad_rows_percent
+        return stats
+
     def validate_data(self) -> ValidatedResult:
         csv_result_validation = self.validate_csv()
         if (
@@ -354,6 +367,7 @@ class ValidationService:
         else:
             validated_result_for_check_col_type = self.validate_columns_dtype()
             self._cast_dtype_df_after_check_dtype()
+            print(self.df_after_validate_dtype)
             validated_result_no_check_col_type = self.validate_columns_with_validator()
             docs_urls = self._build_datadocs_urls(validated_result_no_check_col_type)
             (parsed_results, overall_result, stats) = (
@@ -363,6 +377,7 @@ class ValidationService:
             parsed_results = self.group_by_parsed_results_by_column(parsed_results)
             # print(f"\n\n\nparsed_results: {parsed_results}\n\n\n")
             final_df = self._make_df_with_is_good_col(parsed_results)
+            stats = self._enrich_stats(stats, final_df)
             return ValidatedResult(
                 file_path=self.file_path,
                 overall_result=overall_result,

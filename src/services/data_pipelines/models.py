@@ -10,6 +10,9 @@ class OverallStatistics:
     successful_expectations: int
     unsuccessful_expectations: int
     success_percent: float
+    rows_count: int = None
+    bad_rows_count: int = None
+    bad_rows_percent: float = None
 
 
 @dataclass
