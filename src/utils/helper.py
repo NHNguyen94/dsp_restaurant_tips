@@ -4,8 +4,6 @@ from typing import Dict
 
 import yaml
 
-from src.utils.date_time_manager import DateTimeManager
-
 
 def load_yml_configs(config_path: str) -> Dict:
     with open(config_path, "r") as file:
@@ -21,8 +19,4 @@ def get_current_user() -> str:
 
 
 def get_unique_id() -> str:
-    return (
-        str(uuid.uuid4())
-        + "_"
-        + DateTimeManager.get_current_local_time_str().replace(" ", "_")
-    )
+    return str(uuid.uuid4())
