@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
+import joblib
 
 from src.utils.configs_manager import ModelPathConfigs, ModelConfigs
 
@@ -22,7 +23,7 @@ def train_model(df: pd.DataFrame) -> XGBRegressor:
 def main():
     df = pd.read_csv(model_path_configs.PROCESSED_DATA_PATH)
     model = train_model(df)
-    model.save_model(model_path_configs.MODEL_PATH)
+    joblib.dump(model, model_path_configs.MODEL_PATH)
 
 
 if __name__ == "__main__":

@@ -58,6 +58,7 @@ class ApiController:
         connection.request("POST", url, body.getvalue(), headers)
 
         response = connection.getresponse()
+        print(f"response: {response}")
         if response.status != 200:
             raise Exception(f"Failed to make prediction: {response.reason}")
 

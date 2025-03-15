@@ -25,8 +25,8 @@ from airflow.utils.dates import days_ago
     dag_id="ingestion_pipeline",
     description="Ingestion pipeline",
     tags=["ingestion"],
-    schedule_interval=datetime.timedelta(seconds=30),
-    start_date=days_ago(n=0, hour=1),
+    schedule_interval=datetime.timedelta(seconds=60),
+    start_date=days_ago(1, hour=23, minute=55),
     max_active_runs=1,
     catchup=False,
 )
@@ -37,7 +37,9 @@ def ingestion_pipeline():
 
     @task
     def build_validate(file_path: str) -> ValidatedResult:
-        return run_validate_data(file_path, "batch for ingestion pipeline")
+        validated_result = run_validate_data(file_path, "batch for ingestion pipeline")
+        logging.debug(f"validated_result: {validated_result}")
+        return validated_result
 
     @task
     def build_alert(validated_result: ValidatedResult) -> None:

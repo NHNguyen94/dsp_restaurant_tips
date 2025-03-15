@@ -5,7 +5,7 @@ ms_teams_client = MSTeamsClient()
 
 
 def run_alert(validated_result: ValidatedResult) -> None:
-    if validated_result.final_df:
+    if validated_result.csv_results.format and validated_result.csv_results.encoding:
         bad_df = validated_result.final_df[validated_result.final_df["is_good"] == 0]
         if bad_df.shape[0] > 0:
             ms_teams_client.send_message(
