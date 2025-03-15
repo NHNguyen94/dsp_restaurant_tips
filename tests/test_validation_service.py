@@ -1,11 +1,18 @@
-from src.services.data_pipelines.models import ValidatedResult
 from src.services.data_pipelines.ingest.validation import ValidationService
+from src.services.data_pipelines.models import ValidatedResult
 
 
 class TestValidationService:
     failed_test_csv_path = "tests/resources/failed_test_tips.csv"
     failed_test_csv_path_2 = "tests/resources/failed_test_tips_2.csv"
     passed_test_csv_path = "tests/resources/test_tips.csv"
+
+    def test_validate_columns_dtype(self):
+        validation_service = ValidationService(
+            self.failed_test_csv_path, "failed batch"
+        )
+        result = validation_service.validate_columns_dtype()
+        # print(f"\nresult_validate_columns_dtype: {result}")
 
     def test_validate_columns_with_validator(self):
         validation_service = ValidationService(

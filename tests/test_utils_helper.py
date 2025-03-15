@@ -38,11 +38,11 @@ class TestUtilsHelper:
         assert str(parsed_date) == "2021-01-01"
 
     def test_find_non_numerical_values_in_df(self):
-        df = pd.DataFrame({"col": ["1", "2.2", "3.3.3", "a", "b", "c"]})
+        df = pd.DataFrame({"col": ["1", "2.2", "3.3.3", "a", "b", "c", None]})
         non_numerical_values = find_non_numerical_values_in_df(df, "col")
         assert non_numerical_values == ["3.3.3", "a", "b", "c"]
 
     def test_find_numerical_values_in_df(self):
-        df = pd.DataFrame({"col": ["1", "2.2", "3.3.3", "a", "b", "c"]})
+        df = pd.DataFrame({"col": ["1", "2.2", "3.3.3", "a", "b", "c", None]})
         numerical_values = find_numerical_values_in_df(df, "col")
         assert numerical_values == ["1", "2.2"]

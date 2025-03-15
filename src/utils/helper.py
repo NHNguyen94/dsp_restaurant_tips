@@ -31,9 +31,23 @@ def is_number(value: str) -> bool:
         return False
 
 
+def remove_numerical_values(list_values: List) -> List:
+    new_list = [x for x in list_values if not is_number(x)]
+    return [str(x) for x in new_list] if new_list else []
+
+
+def remove_non_numerical_values(list_values: List) -> List:
+    new_list = [x for x in list_values if is_number(x)]
+    return [float(x) for x in new_list] if new_list else []
+
+
 def find_non_numerical_values_in_df(df: pd.DataFrame, col: str) -> List[str]:
-    return df[~df[col].apply(lambda x: is_number(x))][col].unique().tolist()
+    new_df = df.copy()
+    new_df = new_df.dropna(subset=[col])
+    return new_df[~new_df[col].apply(lambda x: is_number(x))][col].tolist()
 
 
 def find_numerical_values_in_df(df: pd.DataFrame, col: str) -> List[str]:
-    return df[df[col].apply(lambda x: is_number(x))][col].unique().tolist()
+    new_df = df.copy()
+    new_df = new_df.dropna(subset=[col])
+    return new_df[new_df[col].apply(lambda x: is_number(x))][col].tolist()
