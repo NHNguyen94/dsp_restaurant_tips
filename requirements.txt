@@ -20,3 +20,4 @@ apache-airflow-providers-postgres==5.13.0
 requests==2.32.3
 pyroscope-io==0.8.8
 chardet==5.2.0
+joblib==1.4.2
