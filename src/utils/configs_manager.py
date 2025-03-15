@@ -34,7 +34,7 @@ class DataPathConfigs(PathConfigs):
 
 
 class ModelPathConfigs(PathConfigs):
-    MODEL_PATH = "src/data_ml_models/models/tips_model.json"
+    MODEL_PATH = "src/data_ml_models/models/tips_model.joblib"
     PRE_PROCESSING_CONFIGS_PATH = "src/configs/pre_processing_configs.yml"
     RAW_DATA_PATH = "src/data_ml_models/raw/tips.csv"
     PROCESSED_DATA_PATH = "src/data_ml_models/processed/tips.parquet"
