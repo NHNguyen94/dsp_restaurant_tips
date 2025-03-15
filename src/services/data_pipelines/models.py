@@ -5,6 +5,18 @@ import pandas as pd
 
 
 @dataclass
+class FailureMode:
+    failure_mode: str
+    count: int
+
+
+@dataclass
+class FailureModePerColumn:
+    column: str
+    failure_mode: FailureMode
+
+
+@dataclass
 class OverallStatistics:
     evaluated_expectations: int
     successful_expectations: int
@@ -13,6 +25,7 @@ class OverallStatistics:
     rows_count: int = None
     bad_rows_count: int = None
     bad_rows_percent: float = None
+    failure_modes: List[FailureModePerColumn] = None
 
 
 @dataclass
@@ -70,6 +83,7 @@ class GXResultPerColumn:
 class CSVResult:
     encoding: bool
     format: bool
+    empty_file: bool = None
 
 
 @dataclass

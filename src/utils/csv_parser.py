@@ -48,3 +48,6 @@ class CSVParser:
             return False
         except Exception:
             return False
+
+    def validate_if_empty_file(self, file_path: str) -> bool:
+        return pd.read_csv(file_path).empty
