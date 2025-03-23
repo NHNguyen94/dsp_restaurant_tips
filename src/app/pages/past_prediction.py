@@ -4,7 +4,8 @@ import pandas as pd
 
 response = None
 pred_df = pd.DataFrame(
-    columns=["Total bill", "Sex", "Smoker", "Day", "Time", "Size", "Predicted tip"]
+    columns=["Total bill", "Sex", "Smoker", "Day", "Time", "Size", "Predicted tip", "Predicted at",
+    "Prediction source", "File Path"]
 )
 
 with st.form("form_predict"):
@@ -27,6 +28,7 @@ if submit:
         },
     )
     response = request.json()
+    print(response)
 
 if response:
     st.dataframe(response)
