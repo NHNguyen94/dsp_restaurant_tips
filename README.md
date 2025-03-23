@@ -8,10 +8,10 @@ pip install -r requirements.txt (The airflow inside poetry behaves differently w
 - Copy and rename the downloaded dataset to: src/data/tips.csv
 - Install docker
 - Run `docker compose up` in the project root directory
-- Run `run-backend`
-- Run `run-frontend`
-- Run `split-dataset` or `split-dataset SPLIT_SIZE=number of files you want to split` This is to split the downloaded kaggle dataset for the ingest pipeline
-- Run `create-false-data` This is to create the false data for the ingest pipeline
+- Run `make run-backend`
+- Run `make run-frontend`
+- Run `make split-dataset` or `make split-dataset SPLIT_SIZE=number of files you want to split` This is to split the downloaded kaggle dataset for the ingest pipeline
+- Run `make create-false-data` This is to create the false data for the ingest pipeline
 - Host airflow locally (read below instruction for how)
 - Go to localhost:8080, log in with the credentials admin/admin, and turn on the ingestion_pipeline and prediction_pipeline
 
