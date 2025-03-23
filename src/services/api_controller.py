@@ -25,7 +25,7 @@ class ApiController:
         self, file_path: str, prediction_source: str
     ) -> List[Dict]:
         host = "127.0.0.1:8000"
-        url = f"/v1/prediction/predict?prediction_source={prediction_source}"
+        url = f"/v1/prediction/predict?prediction_source={prediction_source}&file_path={file_path}"
 
         boundary = str(uuid.uuid4())
         # https://docs.python.org/3/library/io.html#io.BytesIO
@@ -58,7 +58,6 @@ class ApiController:
         connection.request("POST", url, body.getvalue(), headers)
 
         response = connection.getresponse()
-        print(f"response: {response}")
         if response.status != 200:
             raise Exception(f"Failed to make prediction: {response.reason}")
 

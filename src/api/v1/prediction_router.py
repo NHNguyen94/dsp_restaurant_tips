@@ -10,6 +10,7 @@ from src.api.v1.models import (
 from src.database.models import Predictions
 from src.database.service_manager import DatabaseServiceManager
 from src.services.ml_pipelines.inference import async_predict_response_with_features
+from src.utils import DateTimeManager
 from src.utils.api_request_parser import ApiRequestParser
 from src.utils.api_validation_manager import APIValidationManager
 
@@ -32,8 +33,12 @@ def _parse_predictions_to_api_response(
             time=prediction.time,
             size=prediction.size,
             tip=prediction.tip,
+            predicted_at=DateTimeManager.parse_datetime_to_str(prediction.predicted_at),
+            prediction_source=prediction.prediction_source,
+            file_path=prediction.file_path,
         )
         responses.append(res)
+
     return responses
 
 
@@ -41,6 +46,7 @@ def _parse_predictions_to_api_response(
 async def predict(
     input_json: Annotated[PredictionRequest, Depends()] = None,
     input_file: Annotated[UploadFile, File()] = None,
+    file_path: str = None,
     prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp",
 ):
     if APIValidationManager.validate_none_json_request(input_json) == False:
@@ -51,7 +57,10 @@ async def predict(
         raise ValueError("Either request body or input file must be provided.")
 
     df_with_predictions = await async_predict_response_with_features(df)
-    db_service_manager.append_df_to_predictions(df_with_predictions, prediction_source)
+    db_service_manager.append_df_to_predictions(
+        df_with_predictions, file_path, prediction_source
+    )
+
     return df_with_predictions.to_dict(orient="records")
 
 
@@ -60,4 +69,5 @@ async def past_predictions(request: Annotated[PastPredictionRequest, Depends()])
     predicted_results = db_service_manager.get_predicted_results_by_date_range(
         request.start_date, request.end_date, request.prediction_source
     )
+
     return _parse_predictions_to_api_response(predicted_results)
