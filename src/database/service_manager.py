@@ -20,13 +20,16 @@ class DatabaseServiceManager:
             session.commit()
 
     def append_df_to_predictions(
-        self, df_with_predictions: pd.DataFrame, prediction_source
+            self,
+            df_with_predictions: pd.DataFrame,
+            file_path: str,
+            prediction_source: str
     ) -> None:
         with self.session as session:
             # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
             for _, row in df_with_predictions.iterrows():
                 prediction = Predictions(
-                    file_path=None,
+                    file_path=file_path,
                     total_bill=row["total_bill"],
                     sex=row["sex"],
                     smoker=row["smoker"],
@@ -67,7 +70,7 @@ class DatabaseServiceManager:
             return predicted_files
 
     def get_predicted_results_by_date_range(
-        self, start_date: str, end_date: str, prediction_source: str
+            self, start_date: str, end_date: str, prediction_source: str
     ) -> List[Predictions]:
         if prediction_source == "all":
             prediction_source = ["webapp", "scheduled_predictions"]

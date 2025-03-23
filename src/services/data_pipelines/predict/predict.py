@@ -18,7 +18,7 @@ api_response_parser = ApiResponseParser()
 
 
 def _parse_response(
-    response: List[Dict], file_path: str, prediction_source: str
+        response: List[Dict], file_path: str, prediction_source: str
 ) -> List[Predictions]:
     api_response = api_response_parser.parse_response(
         response, prediction_source=prediction_source
@@ -29,7 +29,7 @@ def _parse_response(
 
 
 def run_predict_single_file(
-    file_path: str, prediction_source: str
+        file_path: str, prediction_source: str
 ) -> List[Predictions]:
     response = api_controller.predict_with_file_manual_request(
         file_path, prediction_source
@@ -49,4 +49,5 @@ def run_predictions(file_paths: List[str], prediction_source: str) -> None:
         predictions = run_predict_single_file(
             file_path, prediction_source=prediction_source
         )
+        # logging.INFO(f"Predicted: {predictions}")
         # db_service_manager.append_predictions(predictions)
