@@ -49,5 +49,11 @@ class CSVParser:
         except Exception:
             return False
 
-    def validate_if_empty_file(self, file_path: str) -> bool:
-        return pd.read_csv(file_path).empty
+    def validate_if_can_parse(self, file_path: str) -> bool:
+        try:
+            df = self.read_csv_from_file_path(file_path)
+            if df.empty:
+                return False
+            return True
+        except Exception:
+            return False

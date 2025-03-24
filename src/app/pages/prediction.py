@@ -1,6 +1,6 @@
-import streamlit as st
-import requests as req
 import pandas as pd
+import requests as req
+import streamlit as st
 
 response = None
 pred_df = pd.DataFrame(
@@ -40,4 +40,9 @@ if submit:
     response = request.json()
 
 if response:
-    st.dataframe(response)
+    for res in response:
+        res.pop("predicted_at")
+        res.pop("file_path")
+        res.pop("prediction_source")
+        df = pd.DataFrame(response)
+        st.dataframe(df)

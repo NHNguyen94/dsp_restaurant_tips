@@ -11,8 +11,8 @@ class PredictionResponse(BaseModel):
     time: str
     size: int
     tip: float
-    predicted_at: str
-    prediction_source: str
+    predicted_at: str = None
+    prediction_source: str = None
     file_path: str = None
 
 

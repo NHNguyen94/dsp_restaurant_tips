@@ -5,8 +5,11 @@ ms_teams_client = MSTeamsClient()
 
 
 def run_alert(validated_result: ValidatedResult) -> None:
-    if validated_result.csv_results.format and validated_result.csv_results.encoding:
-        if validated_result.csv_results.empty_file:
+    if (
+        validated_result.csv_results.good_delimiter
+        and validated_result.csv_results.good_encoding
+    ):
+        if validated_result.csv_results.no_other_parse_issues:
             ms_teams_client.send_message(
                 f"Empty file detected: {validated_result.file_path}"
             )

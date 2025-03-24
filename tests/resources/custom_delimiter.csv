@@ -1,0 +1,11 @@
+total_bill	sex	smoker	day	time	size
+626.7070946237402	Female	No	Mon	Lunch	9
+491.551353890204	Female	Yes	Fri	Dinner	5
+568.6484507055895	Female	Yes	Sun	Dinner	1
+259.6234747787748	Female	Yes	Wed	Dinner	3
+112.46094001143203	Male	No	Mon	Lunch	5
+298.2254229594905	Male	No	Tue	Lunch	7
+48.936368682180984	Female	No	Thur	Dinner	2
+716.7694793670265	Female	Yes	Wed	Dinner	3
+44.11662033564956	Male	Yes	Mon	Lunch	2
+144.47832127733372	Female	No	Fri	Lunch	7

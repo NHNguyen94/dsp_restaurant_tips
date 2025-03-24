@@ -18,9 +18,9 @@ def _parse_validated_results_to_data_issues(
     bad_csv_format = 0
 
     if validated_result.csv_results is not None:
-        if validated_result.csv_results.encoding:
+        if validated_result.csv_results.good_encoding:
             bad_csv_encoding += 1
-        if validated_result.csv_results.format:
+        if validated_result.csv_results.good_delimiter:
             bad_csv_format += 1
 
     parsed_results_gx = validated_result.parsed_results_gx
@@ -59,7 +59,13 @@ def _parse_validated_results_to_data_issues(
 
 
 def run_save_statistics(validated_result: ValidatedResult) -> None:
-    # TODO: Handle empty csv file
-    if validated_result.csv_results.format and validated_result.csv_results.encoding:
+    if (
+        validated_result.csv_results.good_encoding
+        and validated_result.csv_results.good_delimiter
+        and validated_result.csv_results.no_other_parse_issues
+    ):
         data_issues = _parse_validated_results_to_data_issues(validated_result)
         db_service_manager.append_data_issues(data_issues)
+    else:
+        # TODO: Handle empty csv file
+        pass
