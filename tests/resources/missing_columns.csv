@@ -1,0 +1,11 @@
+total_bill,sex,smoker,day,time
+165.23493687499257,Female,Yes,Mon,Dinner
+815.3415085117124,Female,Yes,Sun,Lunch
+221.22351612144465,Male,Yes,Fri,Dinner
+123.99876496051931,Female,No,Fri,Lunch
+855.0208050757826,Male,No,Sat,Lunch
+949.0174535136919,Male,No,Mon,Lunch
+279.2039902761876,Male,Yes,Thur,Dinner
+727.8497112390546,Female,Yes,Fri,Dinner
+301.9277682140981,Male,Yes,Tue,Dinner
+21.01744682485107,Male,Yes,Sat,Lunch
