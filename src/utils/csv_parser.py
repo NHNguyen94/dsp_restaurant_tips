@@ -14,7 +14,7 @@ class CSVParser:
         self.default_delimiter = DataConfigs.DEFAULT_DELIMITER
 
     async def read_csv_from_file_upload(
-        self, file: UploadFile, delimiter: str = None
+            self, file: UploadFile, delimiter: str = None
     ) -> pd.DataFrame:
         if delimiter is None:
             delimiter = self.default_delimiter
@@ -24,7 +24,7 @@ class CSVParser:
         )
 
     def read_csv_from_file_path(
-        self, file_path: str, delimiter: str = None
+            self, file_path: str, delimiter: str = None
     ) -> pd.DataFrame:
         if delimiter is None:
             delimiter = self.default_delimiter
@@ -49,5 +49,11 @@ class CSVParser:
         except Exception:
             return False
 
-    def validate_if_empty_file(self, file_path: str) -> bool:
-        return pd.read_csv(file_path).empty
+    def validate_if_can_parse(self, file_path: str) -> bool:
+        try:
+            df = self.read_csv_from_file_path(file_path)
+            if df.empty:
+                return False
+            return True
+        except Exception:
+            return False

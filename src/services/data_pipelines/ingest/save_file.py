@@ -25,8 +25,8 @@ def run_save_file(validated_result: ValidatedResult) -> None:
     file_name = validated_result.file_path.split("/")[-1]
     file_name = f"{file_name}_{get_unique_id()}.csv"
     # Only do in case csv is parsed properly
-    if validated_result.csv_results.format and validated_result.csv_results.encoding:
-        if validated_result.csv_results.empty_file:
+    if validated_result.csv_results.good_delimiter and validated_result.csv_results.good_encoding:
+        if validated_result.csv_results.no_other_parse_issues:
             DirectoryManager.move_file(
                 validated_result.file_path,
                 f"{data_path_configs.BAD_DATA_PATH}/{file_name}",

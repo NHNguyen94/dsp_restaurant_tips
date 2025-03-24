@@ -45,24 +45,36 @@ class ValidationService:
         self.file_path = file_path
         self.batch_definition = batch_definition
         self.parser = CSVParser()
-        self.df = self.parser.read_csv_from_file_path(self.file_path)
-        self.df_after_validate_dtype = self.df.copy()
         self.expected_data = data_configs.EXPECTED_RESULTS_FOR_VALIDATION
         self.context = gx.get_context()
         self.default_delimiter = data_configs.DEFAULT_DELIMITER
+        self.csv_result = self._validate_csv()
+        self.good_csv_parsed = self._check_if_good_csv_issue()
+        if self.good_csv_parsed:
+            self.df = self.parser.read_csv_from_file_path(self.file_path)
+            self.df_after_validate_dtype = self.df.copy()
+        else:
+            self.df = None
+            self.df_after_validate_dtype = None
+
+    def _check_if_good_csv_issue(self) -> bool:
+        if (
+                self.csv_result.good_delimiter
+                and self.csv_result.good_encoding
+                and self.csv_result.no_other_parse_issues
+        ):
+            return True
+        return False
 
     def _validate_csv(self) -> CSVResult:
-        encoding = self.parser.validate_if_default_encoding(self.file_path)
-        format = self.parser.validate_if_default_delimiter(self.file_path)
-        if encoding and format:
-            empty_file = self.parser.validate_if_empty_file(self.file_path)
-        else:
-            empty_file = None
+        good_encoding = self.parser.validate_if_default_encoding(self.file_path)
+        good_delimiter = self.parser.validate_if_default_delimiter(self.file_path)
+        no_other_parse_issues = self.parser.validate_if_can_parse(self.file_path)
 
         return CSVResult(
-            encoding=encoding,
-            format=format,
-            empty_file=empty_file,
+            good_encoding=good_encoding,
+            good_delimiter=good_delimiter,
+            no_other_parse_issues=no_other_parse_issues,
         )
 
     def _get_gx_batch(self, df: pd.DataFrame) -> Batch:
@@ -81,8 +93,8 @@ class ValidationService:
         return Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     def _build_datadocs_urls(
-        self,
-        results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
+            self,
+            results: Union[ExpectationValidationResult, ExpectationSuiteValidationResult],
     ) -> List:
         suite_identifier = ExpectationSuiteIdentifier(
             name=results.meta["expectation_suite_name"]
@@ -100,11 +112,11 @@ class ValidationService:
         return docs_urls
 
     def _parse_results_from_validator(
-        self,
-        input_results: Union[
-            ExpectationValidationResult, ExpectationSuiteValidationResult
-        ],
-        validated_results_for_check_col_type: List[GXResultPerColumn] = None,
+            self,
+            input_results: Union[
+                ExpectationValidationResult, ExpectationSuiteValidationResult
+            ],
+            validated_results_for_check_col_type: List[GXResultPerColumn] = None,
     ) -> (List[GXResultPerColumn], bool, OverallStatistics):
         parsed_results = []
         overall_result = input_results["success"]
@@ -150,8 +162,8 @@ class ValidationService:
                 "expect_column_values_to_be_between",
             ]:
                 if (
-                    expectation_config["kwargs"]["column"]
-                    in wrong_type_columns_to_ignore
+                        expectation_config["kwargs"]["column"]
+                        in wrong_type_columns_to_ignore
                 ):
                     continue
                 else:
@@ -171,7 +183,7 @@ class ValidationService:
         return (parsed_results, overall_result, stats)
 
     def _group_by_parsed_results_by_column(
-        self, parsed_results: List[GXResultPerColumn]
+            self, parsed_results: List[GXResultPerColumn]
     ) -> List[GXResultPerColumn]:
         grouped_results = []
         for col in self.expected_data.keys():
@@ -184,26 +196,26 @@ class ValidationService:
                             res.all_results.result_column_exist
                         )
                         final_success_for_column = (
-                            final_success_for_column and res.success
+                                final_success_for_column and res.success
                         )
                     if res.all_results.result_be_of_type:
                         new_all_res.result_be_of_type = (
                             res.all_results.result_be_of_type
                         )
                         final_success_for_column = (
-                            final_success_for_column and res.success
+                                final_success_for_column and res.success
                         )
                     if res.all_results.result_not_null:
                         new_all_res.result_not_null = res.all_results.result_not_null
                         final_success_for_column = (
-                            final_success_for_column and res.success
+                                final_success_for_column and res.success
                         )
                     if res.all_results.result_between_or_in_set:
                         new_all_res.result_between_or_in_set = (
                             res.all_results.result_between_or_in_set
                         )
                         final_success_for_column = (
-                            final_success_for_column and res.success
+                                final_success_for_column and res.success
                         )
             new_parsed_res = GXResultPerColumn(
                 success=final_success_for_column, column=col, all_results=new_all_res
@@ -212,71 +224,74 @@ class ValidationService:
 
         for data in grouped_results:
             if data.all_results.result_column_exist == False and (
-                data.all_results.result_not_null is None
-                or data.all_results.result_be_of_type is None
-                or data.all_results.result_between_or_in_set is None
+                    data.all_results.result_not_null is None
+                    or data.all_results.result_be_of_type is None
+                    or data.all_results.result_between_or_in_set is None
             ):
                 raise ValueError("Missing validation category")
 
         return grouped_results
 
     def validate_columns_with_validator(
-        self,
+            self,
     ) -> Union[ExpectationValidationResult, ExpectationSuiteValidationResult]:
-        validator = self._get_gx_validator(self.df_after_validate_dtype)
-        suite_name = "validation_suite"
-        validator.expectation_suite_name = suite_name
-        suite = self.context.suites.add(ExpectationSuite(suite_name))
-        # print(f"\n\n\nself.expected_data: {self.expected_data}\n\n\n")
-        for k, v in self.expected_data.items():
-            expectation_col = gx.expectations.ExpectColumnToExist(column=k)
-            suite.add_expectation(expectation_col)
+        if self.good_csv_parsed == False:
+            raise ValueError("The CSV has issue, cannot validate the data")
+        else:
+            validator = self._get_gx_validator(self.df_after_validate_dtype)
+            suite_name = "validation_suite"
+            validator.expectation_suite_name = suite_name
+            suite = self.context.suites.add(ExpectationSuite(suite_name))
+            # print(f"\n\n\nself.expected_data: {self.expected_data}\n\n\n")
+            for k, v in self.expected_data.items():
+                expectation_col = gx.expectations.ExpectColumnToExist(column=k)
+                suite.add_expectation(expectation_col)
 
-            # Disabled since it's replace by the manual check in func validate_columns_dtype
-            # The issue is that ExpectColumnValuesToBeOfType cannot recognize the case that the column has both number and string
-            # Because pandas automatically converts the column to string => All the values are string and fail the validation
-            # expectation_col_type = gx.expectations.ExpectColumnValuesToBeOfType(
-            #     column=k, type_=v["type"]
-            # )
-            # suite.add_expectation(expectation_col_type)
+                # Disabled since it's replace by the manual check in func validate_columns_dtype
+                # The issue is that ExpectColumnValuesToBeOfType cannot recognize the case that the column has both number and string
+                # Because pandas automatically converts the column to string => All the values are string and fail the validation
+                # expectation_col_type = gx.expectations.ExpectColumnValuesToBeOfType(
+                #     column=k, type_=v["type"]
+                # )
+                # suite.add_expectation(expectation_col_type)
 
-            expectation_value = gx.expectations.ExpectColumnValuesToNotBeNull(column=k)
-            suite.add_expectation(expectation_value)
+                expectation_value = gx.expectations.ExpectColumnValuesToNotBeNull(column=k)
+                suite.add_expectation(expectation_value)
 
-            if "min" in v and "max" in v:
-                expectation = gx.expectations.ExpectColumnValuesToBeBetween(
-                    column=k, min_value=v["min"], max_value=v["max"]
-                )
-                suite.add_expectation(expectation)
-            if "accept" in v:
-                # print(f'v_accept: {v["accept"]}, with type: {type(v["accept"])}')
-                expectation = gx.expectations.ExpectColumnValuesToBeInSet(
-                    column=k,
-                    value_set=list(
-                        v["accept"]
-                    ),  # For old version, tuple is not accepted, has to be set/list
-                )
-                suite.add_expectation(expectation)
+                if "min" in v and "max" in v:
+                    expectation = gx.expectations.ExpectColumnValuesToBeBetween(
+                        column=k, min_value=v["min"], max_value=v["max"]
+                    )
+                    suite.add_expectation(expectation)
+                if "accept" in v:
+                    # print(f'v_accept: {v["accept"]}, with type: {type(v["accept"])}')
+                    expectation = gx.expectations.ExpectColumnValuesToBeInSet(
+                        column=k,
+                        value_set=list(
+                            v["accept"]
+                        ),  # For old version, tuple is not accepted, has to be set/list
+                    )
+                    suite.add_expectation(expectation)
 
-        return validator.validate(suite)
+            return validator.validate(suite)
 
     def _create_filter_conditions(
-        self, parsed_results: List[GXResultPerColumn]
+            self, parsed_results: List[GXResultPerColumn]
     ) -> List:
         filter_conditions = []
         for res in parsed_results:
             if res.success == False:
                 if (
-                    res.all_results.result_column_exist == False
+                        res.all_results.result_column_exist == False
                 ):  # Add on here for further error mode to remove all rows
                     remove_all_col = True
                     values_to_remove = []
                 else:
                     remove_all_col = False
                     values_to_remove = (
-                        res.all_results.result_not_null.partial_unexpected_list
-                        + res.all_results.result_between_or_in_set.partial_unexpected_list
-                        + res.all_results.result_be_of_type.partial_unexpected_list
+                            res.all_results.result_not_null.partial_unexpected_list
+                            + res.all_results.result_between_or_in_set.partial_unexpected_list
+                            + res.all_results.result_be_of_type.partial_unexpected_list
                     )
                 filter = {
                     "column": res.column,
@@ -288,7 +303,7 @@ class ValidationService:
         return filter_conditions
 
     def _make_df_with_is_good_col(
-        self, parsed_results: List[GXResultPerColumn]
+            self, parsed_results: List[GXResultPerColumn]
     ) -> pd.DataFrame:
         new_df = self.df.copy()
         filter_conditions = self._create_filter_conditions(parsed_results)
@@ -322,44 +337,47 @@ class ValidationService:
                 ].astype(v["type"])
 
     def validate_columns_dtype(self) -> List[GXResultPerColumn]:
-        validated_result_for_check_col_type = []
-        for k, v in self.expected_data.items():
-            element_count = self.df[k].count()
-            if v["type"] in ["float", "int"]:
-                partial_unexpected_list = find_non_numerical_values_in_df(self.df, k)
-            elif v["type"] == "str":
-                partial_unexpected_list = find_numerical_values_in_df(self.df, k)
-            else:
-                partial_unexpected_list = []
-            unexpected_count = len(partial_unexpected_list)
-            unexpected_percent = unexpected_count / element_count * 100
-            if len(partial_unexpected_list) > 0:
-                result = False
-                self.df_after_validate_dtype = self.df_after_validate_dtype[
-                    self.df_after_validate_dtype[k].isin(partial_unexpected_list)
-                    == False
-                ]
-            else:
-                result = True
-            details = GXResultBeOfTypeDetails(
-                result=result,
-                element_count=element_count,
-                unexpected_count=unexpected_count,
-                unexpected_percent=unexpected_percent,
-                partial_unexpected_list=list(set(partial_unexpected_list)),
-            )
-            validated_result_for_check_col_type.append(
-                GXResultPerColumn(
-                    success=result,
-                    column=k,
-                    all_results=AllResults(result_be_of_type=details),
+        if self.good_csv_parsed == False:
+            raise ValueError("The CSV has issue, cannot validate the data")
+        else:
+            validated_result_for_check_col_type = []
+            for k, v in self.expected_data.items():
+                element_count = self.df[k].count()
+                if v["type"] in ["float", "int"]:
+                    partial_unexpected_list = find_non_numerical_values_in_df(self.df, k)
+                elif v["type"] == "str":
+                    partial_unexpected_list = find_numerical_values_in_df(self.df, k)
+                else:
+                    partial_unexpected_list = []
+                unexpected_count = len(partial_unexpected_list)
+                unexpected_percent = unexpected_count / element_count * 100
+                if len(partial_unexpected_list) > 0:
+                    result = False
+                    self.df_after_validate_dtype = self.df_after_validate_dtype[
+                        self.df_after_validate_dtype[k].isin(partial_unexpected_list)
+                        == False
+                        ]
+                else:
+                    result = True
+                details = GXResultBeOfTypeDetails(
+                    result=result,
+                    element_count=element_count,
+                    unexpected_count=unexpected_count,
+                    unexpected_percent=unexpected_percent,
+                    partial_unexpected_list=list(set(partial_unexpected_list)),
                 )
-            )
+                validated_result_for_check_col_type.append(
+                    GXResultPerColumn(
+                        success=result,
+                        column=k,
+                        all_results=AllResults(result_be_of_type=details),
+                    )
+                )
 
-        return validated_result_for_check_col_type
+            return validated_result_for_check_col_type
 
     def _parse_failure_modes(
-        self, parsed_results: List[GXResultPerColumn]
+            self, parsed_results: List[GXResultPerColumn]
     ) -> List[FailureModePerColumn]:
         failure_modes_all_columns = []
         for res in parsed_results:
@@ -408,10 +426,10 @@ class ValidationService:
         return failure_modes_all_columns
 
     def _enrich_stats(
-        self,
-        stats: OverallStatistics,
-        final_df: pd.DataFrame,
-        parsed_results: List[GXResultPerColumn],
+            self,
+            stats: OverallStatistics,
+            final_df: pd.DataFrame,
+            parsed_results: List[GXResultPerColumn],
     ) -> OverallStatistics:
         failure_modes_all_columns = self._parse_failure_modes(parsed_results)
         rows_count = len(final_df)
@@ -425,16 +443,11 @@ class ValidationService:
         return stats
 
     def validate_data(self) -> ValidatedResult:
-        csv_result_validation = self._validate_csv()
-        if (
-            csv_result_validation.format == False
-            or csv_result_validation.encoding == False
-            or csv_result_validation.empty_file == True
-        ):
+        if self.good_csv_parsed == False:
             return ValidatedResult(
                 file_path=self.file_path,
                 overall_result=False,
-                csv_results=csv_result_validation,
+                csv_results=self.csv_result,
             )
 
         else:
@@ -455,7 +468,7 @@ class ValidationService:
                 file_path=self.file_path,
                 overall_result=overall_result,
                 overall_statistics=stats,
-                csv_results=csv_result_validation,
+                csv_results=self.csv_result,
                 parsed_results_gx=parsed_results,
                 docs_urls=docs_urls,
                 final_df=final_df,
