@@ -1,5 +1,4 @@
 from pprint import pprint
-import pytest
 from src.services.data_pipelines.ingest.validation import ValidationService
 from src.services.data_pipelines.models import ValidatedResult
 from src.utils.configs_manager import QualityConfigs
@@ -51,6 +50,15 @@ class TestValidationService:
         assert result.good_delimiter == True
         assert result.no_other_parse_issues == False
 
+    def test_validate_missing_column(self):
+        validation_service = ValidationService(
+            self.missing_col_csv_path, "missing column"
+        )
+        result = validation_service._validate_csv()
+        assert result.good_encoding == True
+        assert result.good_delimiter == True
+        assert result.no_other_parse_issues == True
+
     def test_validate_good_csv(self):
         validation_service = ValidationService(self.passed_test_csv_path, "good batch")
         result = validation_service._validate_csv()
@@ -88,6 +96,14 @@ class TestValidationService:
         # pprint(f"\nresult_validate_columns_with_validator: {result}")
         assert result.success == False
 
+    def test_validate_columns_with_validator_missing_column(self):
+        validation_service = ValidationService(
+            self.missing_col_csv_path, "missing column"
+        )
+        result = validation_service.validate_columns_with_validator()
+        # pprint(f"\nresult_validate_columns_with_validator: {result}")
+        assert result.success == False
+
     def test_fail_validate_data_failed_batch_1(self):
         validation_service = ValidationService(
             self.failed_test_csv_path, "failed batch"
@@ -118,3 +134,12 @@ class TestValidationService:
         total_good_cols = df[quality_configs.IS_GOOD].sum()
         assert isinstance(result, ValidatedResult)
         assert total_good_cols == 3
+
+    def test_pass_validate_data_missing_column(self):
+        validation_service = ValidationService(self.missing_col_csv_path, "pass batch")
+        result = validation_service.validate_data()
+        # pprint(f"\nresult_passed_test_validate_data: {result}")
+        df = result.final_df
+        total_good_cols = df[quality_configs.IS_GOOD].sum()
+        assert isinstance(result, ValidatedResult)
+        assert total_good_cols == 0
