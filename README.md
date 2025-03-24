@@ -20,6 +20,7 @@
 # To init and run airflow:
 ## For MacOS users:
 - Run `export AIRFLOW_HOME=$(pwd)`
+- Skip the steps to init airflow and create admin if you have already done it
 - Run `make init-airflow`
 - Run `make create-admin-airflow`
 - Then copy the content of example_cfg_for_airflow.cfg into airflow.cfg
