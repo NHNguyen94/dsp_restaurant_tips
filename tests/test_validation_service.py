@@ -17,7 +17,6 @@ class TestValidationService:
     combined_false_correct_csv_path = "tests/resources/false_data.csv"
     missing_col_csv_path = "tests/resources/missing_columns.csv"
 
-
     def test_validate_failed_csv(self):
         validation_service = ValidationService(
             self.failed_test_csv_path, "failed batch"
@@ -37,9 +36,7 @@ class TestValidationService:
         assert result.no_other_parse_issues == True
 
     def test_validate_empty_csv(self):
-        validation_service = ValidationService(
-            self.empty_csv_path, "empty batch"
-        )
+        validation_service = ValidationService(self.empty_csv_path, "empty batch")
         result = validation_service._validate_csv()
         assert result.good_encoding == True
         assert result.good_delimiter == False
@@ -55,18 +52,14 @@ class TestValidationService:
         assert result.no_other_parse_issues == False
 
     def test_validate_good_csv(self):
-        validation_service = ValidationService(
-            self.passed_test_csv_path, "good batch"
-        )
+        validation_service = ValidationService(self.passed_test_csv_path, "good batch")
         result = validation_service._validate_csv()
         assert result.good_encoding == True
         assert result.good_delimiter == True
         assert result.no_other_parse_issues == True
 
     def test_validate_columns_dtype_pass_batch(self):
-        validation_service = ValidationService(
-            self.passed_test_csv_path, "pass batch"
-        )
+        validation_service = ValidationService(self.passed_test_csv_path, "pass batch")
         result = validation_service.validate_columns_dtype()
         # pprint(f"\nresult_validate_columns_dtype: {result}")
         for res in result:
@@ -82,9 +75,7 @@ class TestValidationService:
             assert res.success == True
 
     def test_validate_columns_with_validator_pass_batch(self):
-        validation_service = ValidationService(
-            self.passed_test_csv_path, "pass batch"
-        )
+        validation_service = ValidationService(self.passed_test_csv_path, "pass batch")
         result = validation_service.validate_columns_with_validator()
         # pprint(f"\nresult_validate_columns_with_validator: {result}")
         assert result.success == True
@@ -120,9 +111,7 @@ class TestValidationService:
         assert total_good_cols == 10
 
     def test_pass_validate_data_pass_batch(self):
-        validation_service = ValidationService(
-            self.passed_test_csv_path, "pass batch"
-        )
+        validation_service = ValidationService(self.passed_test_csv_path, "pass batch")
         result = validation_service.validate_data()
         # pprint(f"\nresult_passed_test_validate_data: {result}")
         df = result.final_df
