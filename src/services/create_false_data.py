@@ -79,6 +79,11 @@ def create_empty_csv(file_path: str) -> None:
     df.to_csv(file_path, index=False)
 
 
+def create_empty_csv_with_header(file_path: str) -> None:
+    df = pd.DataFrame(columns=["total_bill", "tip", "sex", "smoker", "day", "time", "size"])
+    df.to_csv(file_path, index=False)
+
+
 def main(n: int):
     df_false_data = create_false_and_correct_data(n)
     df_false_data.to_csv(
@@ -97,6 +102,9 @@ def main(n: int):
     )
     create_empty_csv(
         f"{data_path_configs.RAW_DATA_PATH}/empty_csv_{get_unique_id()}.csv"
+    )
+    create_empty_csv_with_header(
+        f"{data_path_configs.RAW_DATA_PATH}/empty_csv_with_header_{get_unique_id()}.csv"
     )
 
 
