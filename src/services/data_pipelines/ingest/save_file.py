@@ -24,20 +24,19 @@ def _split_good_and_bad(df: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
 def run_save_file(validated_result: ValidatedResult) -> None:
     file_name = validated_result.file_path.split("/")[-1]
     file_name = f"{file_name}_{get_unique_id()}.csv"
-    # Only do in case csv is parsed properly
     if (
-        validated_result.csv_results.good_delimiter
-        and validated_result.csv_results.good_encoding
+        validated_result.csv_results.good_encoding
+        and validated_result.csv_results.good_delimiter
+        and validated_result.csv_results.no_other_parse_issues
     ):
-        if validated_result.csv_results.no_other_parse_issues:
-            DirectoryManager.move_file(
-                validated_result.file_path,
-                f"{data_path_configs.BAD_DATA_PATH}/{file_name}",
-            )
-        else:
-            good_df, bad_df = _split_good_and_bad(validated_result.final_df)
-            if not good_df.empty:
-                _save_file(f"{data_path_configs.GOOD_DATA_PATH}/{file_name}", good_df)
-            if not bad_df.empty:
-                _save_file(f"{data_path_configs.BAD_DATA_PATH}/{file_name}", bad_df)
-            DirectoryManager.delete_file(validated_result.file_path)
+        good_df, bad_df = _split_good_and_bad(validated_result.final_df)
+        if not good_df.empty:
+            _save_file(f"{data_path_configs.GOOD_DATA_PATH}/{file_name}", good_df)
+        if not bad_df.empty:
+            _save_file(f"{data_path_configs.BAD_DATA_PATH}/{file_name}", bad_df)
+        DirectoryManager.delete_file(validated_result.file_path)
+    else:
+        DirectoryManager.move_file(
+            validated_result.file_path,
+            f"{data_path_configs.BAD_DATA_PATH}/{file_name}",
+        )
