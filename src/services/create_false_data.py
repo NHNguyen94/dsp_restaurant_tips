@@ -18,7 +18,9 @@ def _create_correct_data(n: int) -> pd.DataFrame:
         total_bill_list.append(np.random.uniform(0, 1000))
         sex_list.append(np.random.choice(["Male", "Female"]))
         smoker_list.append(np.random.choice(["Yes", "No"]))
-        day_list.append(np.random.choice(["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"]))
+        day_list.append(
+            np.random.choice(["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"])
+        )
         time_list.append(np.random.choice(["Lunch", "Dinner"]))
         size_list.append(np.random.randint(1, 10))
     data = {
@@ -80,7 +82,9 @@ def create_empty_csv(file_path: str) -> None:
 
 
 def create_empty_csv_with_header(file_path: str) -> None:
-    df = pd.DataFrame(columns=["total_bill", "tip", "sex", "smoker", "day", "time", "size"])
+    df = pd.DataFrame(
+        columns=["total_bill", "tip", "sex", "smoker", "day", "time", "size"]
+    )
     df.to_csv(file_path, index=False)
 
 
