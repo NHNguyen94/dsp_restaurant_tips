@@ -13,13 +13,14 @@ class TestValidationService:
     passed_test_csv_path = "tests/resources/test_tips.csv"
     custom_delimiter_csv_path = "tests/resources/custom_delimiter.csv"
     empty_csv_path = "tests/resources/empty_csv.csv"
+    empty_csv_with_header_path = "tests/resources/empty_csv_with_header.csv"
     combined_false_correct_csv_path = "tests/resources/false_data.csv"
     missing_col_csv_path = "tests/resources/missing_columns.csv"
 
 
-    def test_validate_good_csv(self):
+    def test_validate_failed_csv(self):
         validation_service = ValidationService(
-            self.passed_test_csv_path, "good batch"
+            self.failed_test_csv_path, "failed batch"
         )
         result = validation_service._validate_csv()
         assert result.good_encoding == True
@@ -43,6 +44,24 @@ class TestValidationService:
         assert result.good_encoding == True
         assert result.good_delimiter == False
         assert result.no_other_parse_issues == False
+
+    def test_validate_empty_csv_with_header(self):
+        validation_service = ValidationService(
+            self.empty_csv_with_header_path, "empty batch with header"
+        )
+        result = validation_service._validate_csv()
+        assert result.good_encoding == True
+        assert result.good_delimiter == True
+        assert result.no_other_parse_issues == False
+
+    def test_validate_good_csv(self):
+        validation_service = ValidationService(
+            self.passed_test_csv_path, "good batch"
+        )
+        result = validation_service._validate_csv()
+        assert result.good_encoding == True
+        assert result.good_delimiter == True
+        assert result.no_other_parse_issues == True
 
     def test_validate_columns_dtype_pass_batch(self):
         validation_service = ValidationService(
