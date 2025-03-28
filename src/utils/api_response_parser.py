@@ -1,7 +1,6 @@
 from typing import Dict, List
 
 from src.database.models import Predictions
-from src.utils import DateTimeManager
 
 
 class ApiResponseParser:
@@ -9,14 +8,5 @@ class ApiResponseParser:
         pass
 
     @staticmethod
-    def parse_response(
-        response: List[Dict], prediction_source: str
-    ) -> List[Predictions]:
-        return [
-            Predictions(
-                **res,
-                prediction_source=prediction_source,
-                predicted_at=DateTimeManager.get_current_local_time(),
-            )
-            for res in response
-        ]
+    def parse_response(response: List[Dict]) -> List[Predictions]:
+        return [Predictions(**res) for res in response]
