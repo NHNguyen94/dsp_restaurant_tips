@@ -4,6 +4,7 @@ from src.database.models import Predictions
 from src.database.service_manager import DatabaseServiceManager
 from src.services.api_controller import ApiController
 from src.utils.api_response_parser import ApiResponseParser
+from src.utils.date_time_manager import DateTimeManager
 
 api_controller = ApiController()
 db_service_manager = DatabaseServiceManager()
@@ -19,12 +20,13 @@ api_response_parser = ApiResponseParser()
 def _parse_response(
     response: List[Dict], file_path: str, prediction_source: str
 ) -> List[Predictions]:
-    api_response = api_response_parser.parse_response(
-        response, prediction_source=prediction_source
-    )
+    print(f"Response: {response}")
+    api_response = api_response_parser.parse_response(response)
     for res in api_response:
+        res.prediction_source = prediction_source
         res.file_path = file_path
-
+        res.predicted_at = DateTimeManager.get_current_local_time()
+    print(f"Parsed response: {api_response}")
     return api_response
 
 
