@@ -47,7 +47,7 @@ def _create_false_data(n: int) -> pd.DataFrame:
         smoker_list.append(np.random.choice(["Maybe", "Maybe Not", None]))
         day_list.append(np.random.choice(["Weekday", "Weekend", None]))
         time_list.append(np.random.choice(["Breakfast", "Supper", None]))
-        size_list.append(np.random.choice(["one", "two", None]))
+        size_list.append(np.random.choice([-1, -2, None]))
     data = {
         "total_bill": total_bill_list,
         "sex": sex_list,
@@ -113,4 +113,4 @@ def main(n: int):
 
 
 if __name__ == "__main__":
-    main(int(10))
+    main(int(20))
