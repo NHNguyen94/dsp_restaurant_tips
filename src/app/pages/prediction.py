@@ -44,5 +44,5 @@ if response:
         res.pop("predicted_at")
         res.pop("file_path")
         res.pop("prediction_source")
-        df = pd.DataFrame(response)
-        st.dataframe(df)
+    df = pd.DataFrame(response)
+    st.dataframe(df)
