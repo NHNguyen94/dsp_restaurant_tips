@@ -6,7 +6,7 @@ from src.utils.date_time_manager import DateTimeManager
 db_service_manager = DatabaseServiceManager()
 
 
-def _parse_validated_results_to_data_issues(
+def _parse_validated_results_with_good_csv(
     validated_result: ValidatedResult,
 ) -> DataIssues:
     missing_columns = 0
@@ -14,14 +14,6 @@ def _parse_validated_results_to_data_issues(
     duplicated_rows = 0
     unknown_categorical_values = 0
     unknon_numeric_values = 0
-    bad_csv_encoding = 0
-    bad_csv_format = 0
-
-    if validated_result.csv_results is not None:
-        if validated_result.csv_results.good_encoding:
-            bad_csv_encoding += 1
-        if validated_result.csv_results.good_delimiter:
-            bad_csv_format += 1
 
     parsed_results_gx = validated_result.parsed_results_gx
     for res in parsed_results_gx:
@@ -52,8 +44,33 @@ def _parse_validated_results_to_data_issues(
         duplicated_rows=duplicated_rows,
         unknown_categorical_values=unknown_categorical_values,
         unknon_numeric_values=unknon_numeric_values,
+        bad_csv_encoding=0,
+        bad_csv_format=0,
+        other_parse_issues=0,
+        created_at=DateTimeManager.get_current_local_time(),
+    )
+
+
+def _parse_validated_results_with_bad_csv(
+    validated_result: ValidatedResult,
+) -> DataIssues:
+    bad_csv_encoding = 0
+    bad_csv_format = 0
+    other_parse_issues = 0
+
+    if validated_result.csv_results is not None:
+        if validated_result.csv_results.good_encoding == False:
+            bad_csv_encoding += 1
+        if validated_result.csv_results.good_delimiter == False:
+            bad_csv_format += 1
+        if validated_result.csv_results.no_other_parse_issues == False:
+            other_parse_issues += 1
+
+    return DataIssues(
+        file_path=validated_result.file_path,
         bad_csv_encoding=bad_csv_encoding,
         bad_csv_format=bad_csv_format,
+        other_parse_issues=other_parse_issues,
         created_at=DateTimeManager.get_current_local_time(),
     )
 
@@ -64,8 +81,8 @@ def run_save_statistics(validated_result: ValidatedResult) -> None:
         and validated_result.csv_results.good_delimiter
         and validated_result.csv_results.no_other_parse_issues
     ):
-        data_issues = _parse_validated_results_to_data_issues(validated_result)
+        data_issues = _parse_validated_results_with_good_csv(validated_result)
         db_service_manager.append_data_issues(data_issues)
     else:
-        # TODO: Handle empty csv file
-        pass
+        data_issues = _parse_validated_results_with_bad_csv(validated_result)
+        db_service_manager.append_data_issues(data_issues)
