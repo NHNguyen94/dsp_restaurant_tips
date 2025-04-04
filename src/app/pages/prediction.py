@@ -22,8 +22,11 @@ with st.form("form_predict"):
 if submit:
     if uploaded_file:
         csv_file = {"input_file": (uploaded_file.name, uploaded_file, "text/csv")}
+        csv_string = uploaded_file.getvalue().decode("utf-8")
         request = req.post(
-            "http://127.0.0.1:8000/v1/prediction/predict", files=csv_file
+            "http://127.0.0.1:8000/v1/prediction/predict",
+            data=csv_string,
+            headers={"Content-Type": "text/csv"},
         )
     else:
         request = req.post(

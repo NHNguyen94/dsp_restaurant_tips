@@ -64,6 +64,28 @@ class ApiController:
         response_data = response.read().decode()
         return json.loads(response_data)
 
+    def predict_with_file_content(
+        self, file_path: str, prediction_source: str
+    ) -> List[Dict]:
+        url = f"http://127.0.0.1:8000/v1/prediction/predict"
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            csv_content = f.read()
+
+        print(f"CSV content: {csv_content}")
+
+        response = requests.post(
+            url,
+            params={"prediction_source": prediction_source, "file_path": file_path},
+            data=csv_content,
+            headers={"Content-Type": "text/csv"},
+        )
+
+        if response.status_code != 200:
+            raise Exception(f"Failed to make prediction: {response.reason}")
+
+        return response.json()
+
     def predict_with_file(self, file_path: str) -> List[Dict]:
         with open(file_path, "rb") as file:
             files = {"input_file": (file_path, file, "text/csv")}
@@ -72,6 +94,7 @@ class ApiController:
             )
         if response.status_code != 200:
             raise Exception(f"Failed to make prediction: {response.text}")
+
         return response.json()
 
     async def async_predict_with_file(self, file_path: str) -> List[Dict]:
