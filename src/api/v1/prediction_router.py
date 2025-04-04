@@ -1,6 +1,6 @@
 from typing import List, Annotated, Literal
 
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, Depends, Body
 
 from src.api.v1.models import (
     PredictionRequest,
@@ -21,7 +21,7 @@ db_service_manager = DatabaseServiceManager()
 
 
 def _parse_predictions_to_api_response(
-    predictions: List[Predictions],
+        predictions: List[Predictions],
 ) -> List[PredictionResponse]:
     responses = []
     for (prediction,) in predictions:
@@ -44,15 +44,15 @@ def _parse_predictions_to_api_response(
 
 @router.post("/predict", response_model=List[PredictionResponse])
 async def predict(
-    input_json: Annotated[PredictionRequest, Depends()] = None,
-    input_file: Annotated[UploadFile, File()] = None,
-    file_path: str = None,
-    prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp",
+        input_json: Annotated[PredictionRequest, Depends()] = None,
+        input_file: str = Body(default=None, media_type="text/csv"),
+        file_path: str = None,
+        prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp",
 ):
     if APIValidationManager.validate_none_json_request(input_json) == False:
         df = api_request_parser.parse_request_to_df(input_json)
     elif input_file:
-        df = await api_request_parser.parse_csv_to_df(input_file)
+        df = await api_request_parser.read_file_content_to_df(input_file)
     else:
         raise ValueError("Either request body or input file must be provided.")
 
