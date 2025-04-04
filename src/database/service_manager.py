@@ -24,6 +24,7 @@ class DatabaseServiceManager:
     ) -> None:
         with self.session as session:
             # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
+            #TODO: Check if can add whole file to this, row iteration is slow, optimize this
             for _, row in df_with_predictions.iterrows():
                 prediction = Predictions(
                     file_path=file_path,
