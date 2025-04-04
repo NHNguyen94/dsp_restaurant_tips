@@ -42,12 +42,12 @@ def _create_false_data(n: int) -> pd.DataFrame:
     time_list = []
     size_list = []
     for i in range(n):
-        total_bill_list.append(np.random.choice(["a", "b", None]))
+        total_bill_list.append(np.random.choice(["one", -1, None]))
         sex_list.append(np.random.choice(["Non-Binary", "Unknown", None]))
         smoker_list.append(np.random.choice(["Maybe", "Maybe Not", None]))
-        day_list.append(np.random.choice(["Weekday", "Weekend", None]))
+        day_list.append(np.random.choice([2, "Weekend", None]))
         time_list.append(np.random.choice(["Breakfast", "Supper", None]))
-        size_list.append(np.random.choice(["one", "two", None]))
+        size_list.append(np.random.choice([1, "two", None]))
     data = {
         "total_bill": total_bill_list,
         "sex": sex_list,
@@ -113,4 +113,4 @@ def main(n: int):
 
 
 if __name__ == "__main__":
-    main(int(10))
+    main(int(50))
