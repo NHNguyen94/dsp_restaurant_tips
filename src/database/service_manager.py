@@ -43,7 +43,7 @@ class DatabaseServiceManager:
     #         session.commit()
 
     def append_df_to_predictions(
-            self, df_with_predictions: pd.DataFrame, file_path: str, prediction_source: str
+        self, df_with_predictions: pd.DataFrame, file_path: str, prediction_source: str
     ) -> None:
         new_df = df_with_predictions.copy()
         new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
@@ -52,6 +52,17 @@ class DatabaseServiceManager:
         new_df["predicted_at"] = DateTimeManager.get_current_local_time()
         new_df.to_sql(
             "predictions",
+            con=self.session.bind,
+            if_exists="append",
+            index=False,
+        )
+
+    def append_training_data(self, df: pd.DataFrame) -> None:
+        new_df = df.copy()
+        new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
+        new_df["trained_at"] = DateTimeManager.get_current_local_time()
+        new_df.to_sql(
+            "training_data",
             con=self.session.bind,
             if_exists="append",
             index=False,
@@ -84,7 +95,7 @@ class DatabaseServiceManager:
             return predicted_files
 
     def get_predicted_results_by_date_range(
-            self, start_date: str, end_date: str, prediction_source: str
+        self, start_date: str, end_date: str, prediction_source: str
     ) -> List[Predictions]:
         if prediction_source == "all":
             prediction_source = ["webapp", "scheduled_predictions"]
