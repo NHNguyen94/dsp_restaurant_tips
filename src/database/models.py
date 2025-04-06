@@ -25,6 +25,19 @@ class Predictions(ProjectBaseModel, table=True):
     predicted_at: datetime = Field(nullable=False, index=True)
 
 
+class TrainingData(ProjectBaseModel, table=True):
+    __tablename__ = "training_data"
+    id: UUID = Field(primary_key=True, default_factory=uuid4)
+    total_bill: float = Field(nullable=False)
+    sex: str = Field(nullable=False)
+    smoker: str = Field(nullable=False)
+    day: str = Field(nullable=False)
+    time: str = Field(nullable=False)
+    size: int = Field(nullable=False)
+    tip: float = Field(nullable=False)
+    trained_at: datetime = Field(nullable=False, index=True)
+
+
 class DataIssues(ProjectBaseModel, table=True):
     __tablename__ = "data_issues"
     id: UUID = Field(primary_key=True, default_factory=uuid4)

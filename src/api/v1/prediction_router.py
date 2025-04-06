@@ -46,6 +46,7 @@ def _parse_predictions_to_api_response(
 async def predict(
     input_json: Annotated[PredictionRequest, Depends()] = None,
     input_file: str = Body(default=None, media_type="text/csv"),
+    # file_path is to save the file to the database, not to read data from it
     file_path: str = None,
     prediction_source: Literal["webapp", "scheduled_predictions"] = "webapp",
 ):

@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 import pandas as pd
@@ -19,27 +20,53 @@ class DatabaseServiceManager:
             session.add(data_issues)
             session.commit()
 
+    # def append_df_to_predictions(
+    #     self, df_with_predictions: pd.DataFrame, file_path: str, prediction_source: str
+    # ) -> None:
+    #     with self.session as session:
+    #         # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
+    #         # TODO: Check if can add whole file to this, row iteration is slow, optimize this
+    #         for _, row in df_with_predictions.iterrows():
+    #             prediction = Predictions(
+    #                 file_path=file_path,
+    #                 total_bill=row["total_bill"],
+    #                 sex=row["sex"],
+    #                 smoker=row["smoker"],
+    #                 day=row["day"],
+    #                 time=row["time"],
+    #                 size=row["size"],
+    #                 tip=row["tip"],
+    #                 prediction_source=prediction_source,
+    #                 predicted_at=DateTimeManager.get_current_local_time(),
+    #             )
+    #             session.add(prediction)
+    #         session.commit()
+
     def append_df_to_predictions(
         self, df_with_predictions: pd.DataFrame, file_path: str, prediction_source: str
     ) -> None:
-        with self.session as session:
-            # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
-            # TODO: Check if can add whole file to this, row iteration is slow, optimize this
-            for _, row in df_with_predictions.iterrows():
-                prediction = Predictions(
-                    file_path=file_path,
-                    total_bill=row["total_bill"],
-                    sex=row["sex"],
-                    smoker=row["smoker"],
-                    day=row["day"],
-                    time=row["time"],
-                    size=row["size"],
-                    tip=row["tip"],
-                    prediction_source=prediction_source,
-                    predicted_at=DateTimeManager.get_current_local_time(),
-                )
-                session.add(prediction)
-            session.commit()
+        new_df = df_with_predictions.copy()
+        new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
+        new_df["file_path"] = file_path
+        new_df["prediction_source"] = prediction_source
+        new_df["predicted_at"] = DateTimeManager.get_current_local_time()
+        new_df.to_sql(
+            "predictions",
+            con=self.session.bind,
+            if_exists="append",
+            index=False,
+        )
+
+    def append_training_data(self, df: pd.DataFrame) -> None:
+        new_df = df.copy()
+        new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
+        new_df["trained_at"] = DateTimeManager.get_current_local_time()
+        new_df.to_sql(
+            "training_data",
+            con=self.session.bind,
+            if_exists="append",
+            index=False,
+        )
 
     def append_predictions(self, predictions: List[Predictions]) -> None:
         with self.session as session:
