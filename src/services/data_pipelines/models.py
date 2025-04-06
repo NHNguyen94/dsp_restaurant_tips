@@ -81,8 +81,8 @@ class GXResultPerColumn:
 
 @dataclass
 class CSVResult:
-    good_encoding: bool
-    good_delimiter: bool
+    good_encoding: bool = None
+    good_delimiter: bool = None
     no_other_parse_issues: bool = None
 
 

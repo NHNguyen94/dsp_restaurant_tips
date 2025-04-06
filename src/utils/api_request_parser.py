@@ -1,3 +1,4 @@
+from io import StringIO
 from typing import List
 
 import pandas as pd
@@ -33,3 +34,10 @@ class ApiRequestParser:
     async def parse_csv_to_df(self, input_csv: UploadFile) -> pd.DataFrame:
         df = await self.csv_parser.read_csv_from_file_upload(input_csv)
         return self._limit_columns(df)
+
+    async def read_file_content_to_df(self, file_content: str) -> pd.DataFrame:
+        try:
+            df = pd.read_csv(StringIO(file_content))
+            return self._limit_columns(df)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid file content: {e}")

@@ -36,14 +36,13 @@ class DataPathConfigs(PathConfigs):
 class ModelPathConfigs(PathConfigs):
     MODEL_PATH = "src/data_ml_models/models/tips_model.joblib"
     PRE_PROCESSING_CONFIGS_PATH = "src/configs/pre_processing_configs.yml"
-    RAW_DATA_PATH = "src/data_ml_models/raw/tips.csv"
+    RAW_DATA_PATH = DataPathConfigs.DATASET_PATH
     PROCESSED_DATA_PATH = "src/data_ml_models/processed/tips.parquet"
     TEST_DATA_PATH = "src/data_ml_models/test/tips.csv"
 
     @staticmethod
     def create_needed_directories():
         DirectoryManager.create_dir_if_not_exists("src/data_ml_models/models")
-        DirectoryManager.create_dir_if_not_exists("src/data_ml_models/raw")
         DirectoryManager.create_dir_if_not_exists("src/data_ml_models/processed")
 
     @staticmethod
