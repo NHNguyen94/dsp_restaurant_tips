@@ -65,12 +65,15 @@ Important note: $(pwd) does not work for Linux, you have to run `pwd` first, the
 - Then copy that absolute path to the command:
 - `export AIRFLOW_HOME=your_absolute_path`
 - `make run-scheduler`
+
+# Troubleshooting:
 - If you get the error related to conflict ports, you can use the following commands to check and kill the conflict ports
     - Check airflow services: Run `ps aux | grep airflow`
     - Cmd to check and kill conflict ports: 
         - `lsof -i:8080`
         - `lsof -i:8793`
         - `kill -9 <PID>`, where <PID> is the process id of the conflict port
+- If you get the error `The scheduler does not appear to be running` on Airflow UI, try to delete all connections in Airflow UI => Admin => Connections
 
 # To run the unit tests:
 - Run `make unittest`
