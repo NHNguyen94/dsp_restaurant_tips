@@ -32,35 +32,35 @@ csv_parser = CSVParser()
 )
 def ingestion_pipeline():
     @task
-    def ingest() -> str:
+    def read_data() -> str:
         return run_ingest_data()
 
     @task
-    def build_validate(file_path: str) -> ValidatedResult:
+    def validate_data(file_path: str) -> ValidatedResult:
         validated_result = run_validate_data(file_path, "batch for ingestion pipeline")
         logging.debug(f"validated_result: {validated_result}")
 
         return validated_result
 
     @task
-    def build_alert(validated_result: ValidatedResult) -> None:
+    def send_alerts(validated_result: ValidatedResult) -> None:
         if validated_result.overall_result == False:
             run_alert(validated_result)
 
     @task
-    def build_save_file(validated_result: ValidatedResult) -> None:
+    def save_file(validated_result: ValidatedResult) -> None:
         run_save_file(validated_result)
 
     @task
-    def build_save_statistics(validated_result: ValidatedResult) -> None:
+    def save_statistics(validated_result: ValidatedResult) -> None:
         if validated_result.overall_result == False:
             run_save_statistics(validated_result)
 
-    ingested_file = ingest()
-    validated_result = build_validate(ingested_file)
-    build_alert(validated_result)
-    build_save_file(validated_result)
-    build_save_statistics(validated_result)
+    ingested_file = read_data()
+    validated_result = validate_data(ingested_file)
+    send_alerts(validated_result)
+    save_file(validated_result)
+    save_statistics(validated_result)
 
 
 ingestion_pipeline()

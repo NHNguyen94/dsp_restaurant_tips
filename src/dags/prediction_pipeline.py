@@ -21,15 +21,15 @@ from src.services.data_pipelines.predict import run_predictions, check_new_data
 )
 def prediction_pipeline():
     @task
-    def build_check_new_data() -> List[str]:
+    def check_for_new_data() -> List[str]:
         return check_new_data.run_check_new_data()
 
     @task
-    def build_predictions(new_files: List[str]) -> None:
+    def make_predictions(new_files: List[str]) -> None:
         run_predictions(new_files, "scheduled_predictions")
 
-    new_files = build_check_new_data()
-    build_predictions(new_files)
+    new_files = check_for_new_data()
+    make_predictions(new_files)
 
 
 prediction_pipeline()
