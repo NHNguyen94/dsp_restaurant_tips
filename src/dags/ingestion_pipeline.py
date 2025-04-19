@@ -38,7 +38,7 @@ def ingestion_pipeline():
     @task
     def validate_data(file_path: str) -> ValidatedResult:
         validated_result = run_validate_data(file_path, "batch for ingestion pipeline")
-        logging.debug(f"validated_result: {validated_result}")
+        # logging.debug(f"validated_result: {validated_result}")
 
         return validated_result
 
@@ -54,6 +54,7 @@ def ingestion_pipeline():
     @task
     def save_statistics(validated_result: ValidatedResult) -> None:
         if validated_result.overall_result == False:
+            # logging.debug(f"validated_result: {validated_result.final_df.head()}")
             run_save_statistics(validated_result)
 
     ingested_file = read_data()

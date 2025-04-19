@@ -54,6 +54,8 @@ class DataIssues(ProjectBaseModel, table=True):
     bad_csv_encoding: str = Field(nullable=True)
     bad_csv_format: str = Field(nullable=True)
     other_parse_issues: str = Field(nullable=True)
+    total_rows: int = Field(nullable=True)
+    total_bad_rows: int = Field(nullable=True)
     created_at: datetime = Field(nullable=False, index=True)
 
 
