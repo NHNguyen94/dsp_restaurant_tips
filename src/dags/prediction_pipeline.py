@@ -2,6 +2,7 @@ import datetime
 import os
 import sys
 from typing import List
+import logging
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, project_dir)
@@ -22,7 +23,9 @@ from src.services.data_pipelines.predict import run_predictions, check_new_data
 def prediction_pipeline():
     @task
     def check_for_new_data() -> List[str]:
-        return check_new_data.run_check_new_data()
+        new_data = check_new_data.run_check_new_data()
+        # logging.info(f"New data: {new_data}")
+        return new_data
 
     @task
     def make_predictions(new_files: List[str]) -> None:

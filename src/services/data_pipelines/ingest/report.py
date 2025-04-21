@@ -1,9 +1,11 @@
 from src.database.models import DataIssues
 from src.database.service_manager import DatabaseServiceManager
 from src.services.data_pipelines.models import ValidatedResult
+from src.utils.configs_manager import QualityConfigs
 from src.utils.date_time_manager import DateTimeManager
 
 db_service_manager = DatabaseServiceManager()
+quality_configs = QualityConfigs()
 
 
 def _parse_validated_results_with_good_csv(
@@ -14,6 +16,12 @@ def _parse_validated_results_with_good_csv(
     duplicated_rows = 0
     unknown_categorical_values = 0
     unknon_numeric_values = 0
+    total_rows = len(validated_result.final_df)
+    total_bad_rows = len(
+        validated_result.final_df[
+            validated_result.final_df[f"{quality_configs.IS_GOOD}"] != 1
+        ]
+    )
 
     parsed_results_gx = validated_result.parsed_results_gx
     for res in parsed_results_gx:
@@ -47,6 +55,8 @@ def _parse_validated_results_with_good_csv(
         bad_csv_encoding=0,
         bad_csv_format=0,
         other_parse_issues=0,
+        total_rows=total_rows,
+        total_bad_rows=total_bad_rows,
         created_at=DateTimeManager.get_current_local_time(),
     )
 
