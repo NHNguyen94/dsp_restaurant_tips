@@ -66,6 +66,12 @@ Important note: $(pwd) does not work for Linux, you have to run `pwd` first, the
 - `export AIRFLOW_HOME=your_absolute_path`
 - `make run-scheduler`
 
+# To view the dashboards on Grafana:
+- Ensure that docker is running with 'docker compose up'
+- Go to localhost:3000
+- Log in with the credentials admin/admin
+- Click on the dashboard you want to view
+
 # Troubleshooting:
 - If you get the error related to conflict ports, you can use the following commands to check and kill the conflict ports
     - Check airflow services: Run `ps aux | grep airflow`
