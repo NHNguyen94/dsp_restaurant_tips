@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timezone, timedelta, date
 
 
@@ -13,6 +14,14 @@ class DateTimeManager:
     @staticmethod
     def get_current_local_time() -> datetime:
         return datetime.now()
+
+    @staticmethod
+    def get_random_time_before_now(from_days_ago: int) -> datetime:
+        now = datetime.now()
+        start_date = now - timedelta(days=from_days_ago)
+        end_date = now
+        random_time = start_date + (end_date - start_date) * random.random()
+        return random_time
 
     @staticmethod
     def get_hours_ago_str(hours_ago: int) -> str:

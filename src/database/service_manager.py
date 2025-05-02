@@ -20,6 +20,20 @@ class DatabaseServiceManager:
             session.add(data_issues)
             session.commit()
 
+    def append_df_to_data_issues_with_existing_created_at(
+            self, df: pd.DataFrame,
+            file_path: str
+    ) -> None:
+        new_df = df.copy()
+        new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
+        new_df["file_path"] = file_path
+        new_df.to_sql(
+            "data_issues",
+            con=self.session.bind,
+            if_exists="append",
+            index=False,
+        )
+
     # def append_df_to_predictions(
     #     self, df_with_predictions: pd.DataFrame, file_path: str, prediction_source: str
     # ) -> None:
@@ -50,6 +64,20 @@ class DatabaseServiceManager:
         new_df["file_path"] = file_path
         new_df["prediction_source"] = prediction_source
         new_df["predicted_at"] = DateTimeManager.get_current_local_time()
+        new_df.to_sql(
+            "predictions",
+            con=self.session.bind,
+            if_exists="append",
+            index=False,
+        )
+
+    def append_df_to_predictions_with_existing_predicted_at(
+        self, df_with_predictions: pd.DataFrame, file_path: str, prediction_source: str
+    ) -> None:
+        new_df = df_with_predictions.copy()
+        new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
+        new_df["file_path"] = file_path
+        new_df["prediction_source"] = prediction_source
         new_df.to_sql(
             "predictions",
             con=self.session.bind,
