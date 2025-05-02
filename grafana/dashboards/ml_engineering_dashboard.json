@@ -693,7 +693,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN sex = '0' THEN 1 ELSE 0 END)/COUNT(*) AS female_percent,\n         100 - 100*SUM(CASE WHEN sex = '0' THEN 1 ELSE 0 END)/COUNT(*) AS male_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END)/COUNT(*) AS female_percent,\n         100 - 100*SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END)/COUNT(*) AS male_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, female_percent, male_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, female_percent, male_percent\nFROM pred",
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN sex = 0 THEN 1 ELSE 0 END)/COUNT(*) AS female_percent,\n         100 - 100*SUM(CASE WHEN sex = 0 THEN 1 ELSE 0 END)/COUNT(*) AS male_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END)/COUNT(*) AS female_percent,\n         100 - 100*SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END)/COUNT(*) AS male_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, female_percent, male_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, female_percent, male_percent\nFROM pred",
           "refId": "A",
           "sql": {
             "columns": [
@@ -799,7 +799,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN smoker = '0' THEN 1 ELSE 0 END)/COUNT(*) AS no_smoker_percent,\n         100 - 100*SUM(CASE WHEN smoker = '0' THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS no_smoker_percent,\n         100 - 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, no_smoker_percent, smoker_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, no_smoker_percent, smoker_percent\nFROM pred",
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN smoker = 0 THEN 1 ELSE 0 END)/COUNT(*) AS no_smoker_percent,\n         100 - 100*SUM(CASE WHEN smoker = 0 THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS no_smoker_percent,\n         100 - 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, no_smoker_percent, smoker_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, no_smoker_percent, smoker_percent\nFROM pred",
           "refId": "A",
           "sql": {
             "columns": [
@@ -905,7 +905,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN day not in ('1', '7') THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent,\n         100 - 100*SUM(CASE WHEN day not in ('1', '7') THEN 1 ELSE 0 END)/COUNT(*) AS weekend_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent,\n         100 - 100*SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END)/COUNT(*) AS weekend_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, weekday_percent, weekend_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, weekday_percent, weekend_percent\nFROM pred",
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN day not in (1, 7) THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent,\n         100 - 100*SUM(CASE WHEN day not in (1, 7) THEN 1 ELSE 0 END)/COUNT(*) AS weekend_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent,\n         100 - 100*SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END)/COUNT(*) AS weekend_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, weekday_percent, weekend_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, weekday_percent, weekend_percent\nFROM pred",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1011,7 +1011,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN time = '0' THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = '0' THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN time = 'Lunch' THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 'Dinner' THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, lunch_percent, dinner_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, lunch_percent, dinner_percent\nFROM pred",
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN time = 'Lunch' THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 'Dinner' THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM predictions\n  WHERE predicted_at >= $__timeFrom() \n)\nSELECT 'training' AS data, lunch_percent, dinner_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, lunch_percent, dinner_percent\nFROM pred",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1059,5 +1059,5 @@
   "timezone": "browser",
   "title": "ML_engineering_dashboard",
   "uid": "aeilce8wamolce",
-  "version": 11
+  "version": 12
 }
