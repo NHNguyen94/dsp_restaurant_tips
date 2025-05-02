@@ -42,3 +42,6 @@ unittest:
 
 format:
 	PYTHONPATH=. ruff format
+
+data-for-dashboards:
+	PYTHONPATH=. python src/services/create_data_for_dashboards.py
