@@ -22,17 +22,254 @@
   "links": [],
   "panels": [
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 27,
+      "id": 39,
       "panels": [],
       "title": "Statistics for label",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 36,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training_stats AS (\n    SELECT\n        'training' AS data,\n        AVG(tip) AS mean_tip,\n        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tip) AS median_tip,\n        STDDEV(tip) AS tip_std,\n        3*(AVG(tip) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tip))/STDDEV(tip) AS skewness\n    FROM training_data \n),\nprediction_stats AS (\n    SELECT\n        'predictions' AS data,\n        AVG(tip) AS mean_tip,\n        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tip) AS median_tip,\n        STDDEV(tip) AS tip_std,\n        3*(AVG(tip) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tip))/STDDEV(tip) AS skewness\n    FROM predictions\n    WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()\n)\nSELECT * FROM training_stats\nUNION ALL\nSELECT * FROM prediction_stats\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Summary Stats for Tip",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "skewness_difference"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 1,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": null
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 37,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training_stats AS (\n    SELECT\n        3*(AVG(tip) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tip))/STDDEV(tip) AS skewness\n    FROM training_data \n),\nprediction_stats AS (\n    SELECT\n        3*(AVG(tip) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY tip))/STDDEV(tip) AS skewness\n    FROM predictions\n    WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()\n)\n\nSELECT\n    'skewness_difference' AS data,\n    ABS(t.skewness - p.skewness) AS skewness_difference\nFROM training_stats t, prediction_stats p\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Skewness difference for Tip",
+      "type": "barchart"
     },
     {
       "datasource": {
@@ -80,7 +317,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 9
       },
       "id": 24,
       "options": {
@@ -174,7 +411,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 9
       },
       "id": 25,
       "options": {
@@ -228,12 +465,249 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 17
       },
-      "id": 26,
+      "id": 27,
       "panels": [],
-      "title": "Statistics for features",
+      "title": "Statistics for continuous features",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 43,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training_stats AS (\n    SELECT\n        'training' AS data,\n        AVG(total_bill) AS mean_total_bill,\n        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_bill) AS median_total_bill,\n        STDDEV(total_bill) AS total_bill_std,\n        3*(AVG(total_bill) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_bill))/STDDEV(total_bill) AS skewness\n    FROM training_data \n),\nprediction_stats AS (\n    SELECT\n        'predictions' AS data,\n        AVG(total_bill) AS mean_total_bill,\n        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_bill) AS median_total_bill,\n        STDDEV(total_bill) AS total_bill_std,\n        3*(AVG(total_bill) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_bill))/STDDEV(total_bill) AS skewness\n    FROM predictions\n    WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()\n)\nSELECT * FROM training_stats\nUNION ALL\nSELECT * FROM prediction_stats\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Summary Stats for Total bill",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "skewness_difference"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 1,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": null
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 44,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training_stats AS (\n    SELECT\n        3*(AVG(total_bill) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_bill))/STDDEV(total_bill) AS skewness\n    FROM training_data \n),\nprediction_stats AS (\n    SELECT\n        3*(AVG(total_bill) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_bill))/STDDEV(total_bill) AS skewness\n    FROM predictions\n    WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()\n)\n\nSELECT\n    'skewness_difference' AS data,\n    ABS(t.skewness - p.skewness) AS skewness_difference\nFROM training_stats t, prediction_stats p\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Skewness difference for Total bill",
+      "type": "barchart"
     },
     {
       "datasource": {
@@ -281,7 +755,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 10
+        "y": 26
       },
       "id": 31,
       "options": {
@@ -375,7 +849,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 10
+        "y": 26
       },
       "id": 32,
       "options": {
@@ -434,6 +908,243 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 34
+      },
+      "id": 45,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training_stats AS (\n    SELECT\n        'training' AS data,\n        AVG(size) AS mean_size,\n        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size) AS median_size,\n        STDDEV(size) AS size_std,\n        3*(AVG(size) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size))/STDDEV(size) AS skewness\n    FROM training_data \n),\nprediction_stats AS (\n    SELECT\n        'predictions' AS data,\n        AVG(size) AS mean_size,\n        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size) AS median_size,\n        STDDEV(size) AS size_std,\n        3*(AVG(size) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size))/STDDEV(size) AS skewness\n    FROM predictions\n    WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()\n)\nSELECT * FROM training_stats\nUNION ALL\nSELECT * FROM prediction_stats\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Summary Stats for Table size",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "skewness_difference"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 1,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": null
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 34
+      },
+      "id": 46,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training_stats AS (\n    SELECT\n        3*(AVG(size) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size))/STDDEV(size) AS skewness\n    FROM training_data \n),\nprediction_stats AS (\n    SELECT\n        3*(AVG(size) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size))/STDDEV(size) AS skewness\n    FROM predictions\n    WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()\n)\n\nSELECT\n    'skewness_difference' AS data,\n    ABS(t.skewness - p.skewness) AS skewness_difference\nFROM training_stats t, prediction_stats p\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Skewness difference for Table size",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
             "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
@@ -469,7 +1180,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 18
+        "y": 42
       },
       "id": 34,
       "options": {
@@ -563,7 +1274,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 18
+        "y": 42
       },
       "id": 35,
       "options": {
@@ -610,6 +1321,19 @@
       ],
       "title": "Training - Table size distribution",
       "type": "histogram"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 26,
+      "panels": [],
+      "title": "Statistics for categorical features",
+      "type": "row"
     },
     {
       "datasource": {
@@ -662,7 +1386,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 51
       },
       "id": 28,
       "options": {
@@ -731,6 +1455,183 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "female_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "male_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 51
+      },
+      "id": 38,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN sex = 0 THEN 1 ELSE 0 END)/COUNT(*) AS female_percent,\n         100 - 100*SUM(CASE WHEN sex = 0 THEN 1 ELSE 0 END)/COUNT(*) AS male_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END)/COUNT(*) AS female_percent,\n         100 - 100*SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END)/COUNT(*) AS male_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom() \n)\nSELECT 'difference' AS data,\nABS(t.female_percent - p.female_percent) AS female_percent,\nABS(t.male_percent - p.male_percent) AS male_percent\nFROM training t, pred p",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Percent difference for Gender",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "%",
             "axisPlacement": "auto",
             "fillOpacity": 80,
@@ -767,8 +1668,291 @@
       "gridPos": {
         "h": 11,
         "w": 12,
+        "x": 0,
+        "y": 62
+      },
+      "id": 33,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN time = 'Lunch' THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 'Dinner' THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom() \n)\nSELECT 'training' AS data, lunch_percent, dinner_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, lunch_percent, dinner_percent\nFROM pred",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Meal time distribution",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "lunch_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "dinner_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
         "x": 12,
-        "y": 26
+        "y": 62
+      },
+      "id": 40,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN time = 'Lunch' THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 'Dinner' THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom() \n)\nSELECT 'difference' AS data,\n  ABS(t.lunch_percent - p.lunch_percent) AS lunch_percent,\n  ABS(t.dinner_percent - p.dinner_percent) AS dinner_percent\nFROM training t, pred p",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Percent difference for Meal time",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "%",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 0,
+        "y": 73
       },
       "id": 29,
       "options": {
@@ -837,6 +2021,183 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "no_smoker_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "smoker_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 73
+      },
+      "id": 41,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN smoker = 0 THEN 1 ELSE 0 END)/COUNT(*) AS no_smoker_percent,\n         100 - 100*SUM(CASE WHEN smoker = 0 THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS no_smoker_percent,\n         100 - 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom() \n)\nSELECT 'difference' AS data,\n  ABS(t.no_smoker_percent - p.no_smoker_percent) AS no_smoker_percent,\n  ABS(t.smoker_percent - p.smoker_percent) AS smoker_percent\nFROM training t, pred p",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Percent difference for Smoker",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "%",
             "axisPlacement": "auto",
             "fillOpacity": 80,
@@ -874,7 +2235,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 37
+        "y": 84
       },
       "id": 30,
       "options": {
@@ -943,7 +2304,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "%",
+            "axisLabel": "",
             "axisPlacement": "auto",
             "fillOpacity": 80,
             "gradientMode": "none",
@@ -974,15 +2335,86 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "weekday_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "weekend_percent"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 37
+        "y": 84
       },
-      "id": 33,
+      "id": 42,
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
@@ -995,7 +2427,7 @@
           "showLegend": true
         },
         "orientation": "auto",
-        "showValue": "always",
+        "showValue": "auto",
         "stacking": "none",
         "tooltip": {
           "hideZeros": false,
@@ -1011,7 +2443,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 0 THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN time = 'Lunch' THEN 1 ELSE 0 END)/COUNT(*) AS lunch_percent,\n         100 - 100*SUM(CASE WHEN time = 'Dinner' THEN 1 ELSE 0 END)/COUNT(*) AS dinner_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom() \n)\nSELECT 'training' AS data, lunch_percent, dinner_percent\nFROM training\nUNION ALL\nSELECT 'predictions' AS data, lunch_percent, dinner_percent\nFROM pred",
+          "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN day not in (1, 7) THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent,\n         100 - 100*SUM(CASE WHEN day not in (1, 7) THEN 1 ELSE 0 END)/COUNT(*) AS weekend_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent,\n         100 - 100*SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END)/COUNT(*) AS weekend_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom() \n)\nSELECT 'difference' AS data,\n  ABS(t.weekday_percent - p.weekday_percent) AS weekday_percent,\n  ABS(t.weekend_percent - p.weekend_percent) AS weekend_percent\nFROM training t, pred p",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1032,7 +2464,7 @@
           }
         }
       ],
-      "title": "Meal time distribution",
+      "title": "Percent difference for Day",
       "type": "barchart"
     }
   ],
@@ -1059,5 +2491,5 @@
   "timezone": "",
   "title": "ML_engineering_dashboard",
   "uid": "aeilce8wamolce",
-  "version": 13
+  "version": 14
 }
