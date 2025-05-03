@@ -74,7 +74,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "dashed"
             }
           },
           "mappings": [],
@@ -86,7 +86,7 @@
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 5
               }
             ]
           }
@@ -177,6 +177,30 @@
               {
                 "id": "custom.axisLabel",
                 "value": "count"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bad_csv_percentage_threshold"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "%"
+              },
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              },
+              {
+                "id": "custom.axisSoftMax",
+                "value": 100
               }
             ]
           }
@@ -294,7 +318,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "dashed"
             }
           },
           "mappings": [],
@@ -501,5 +525,5 @@
   "timezone": "browser",
   "title": "Data Dashboard",
   "uid": "eejl8029lcxz4a",
-  "version": 5
+  "version": 7
 }
