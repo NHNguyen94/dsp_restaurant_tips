@@ -3,13 +3,13 @@
     "groups": [
         {
             "orgId": 1,
-            "name": "firing-1-minute",
+            "name": "daily_table_size_skewness",
             "folder": "alerting",
             "interval": "1m",
             "rules": [
                 {
-                    "uid": "bekuyv2jxwoaof",
-                    "title": "daily_count_webapp_predictions",
+                    "uid": "fekv1okwyud4wc",
+                    "title": "daily_table_size_skewness",
                     "condition": "C",
                     "data": [
                         {
@@ -25,7 +25,7 @@
                                 "intervalMs": 1000,
                                 "maxDataPoints": 43200,
                                 "rawQuery": true,
-                                "rawSql": "SELECT SUM(CASE WHEN prediction_source = 'webapp' THEN 1 ELSE 0 END) AS pred_webapp\nFROM predictions\nWHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'",
+                                "rawSql": "WITH training_stats AS (\n    SELECT\n        3*(AVG(size) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size))/STDDEV(size) AS skewness\n    FROM training_data \n),\nprediction_stats AS (\n    SELECT\n        3*(AVG(size) - PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY size))/STDDEV(size) AS skewness\n    FROM predictions\n    WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'\n)\nSELECT\n    ABS(t.skewness - p.skewness) AS skewness_difference\nFROM training_stats t, prediction_stats p\n",
                                 "refId": "A",
                                 "sql": {
                                     "columns": [
@@ -99,9 +99,9 @@
                                     {
                                         "evaluator": {
                                             "params": [
-                                                500
+                                                1
                                             ],
-                                            "type": "lt"
+                                            "type": "gt"
                                         },
                                         "operator": {
                                             "type": "and"
@@ -133,8 +133,6 @@
                     "noDataState": "NoData",
                     "execErrState": "Error",
                     "for": "1m",
-                    "annotations": {},
-                    "labels": {},
                     "isPaused": false,
                     "notification_settings": {
                         "receiver": "ms_team_channel_tip_prediction"
