@@ -1,0 +1,144 @@
+{
+    "apiVersion": 1,
+    "groups": [
+        {
+            "orgId": 1,
+            "name": "daily_smoker_diff_smoke",
+            "folder": "alerting",
+            "interval": "1m",
+            "rules": [
+                {
+                    "uid": "fekv31ylj6jnkf",
+                    "title": "daily_smoker_diff_smoke",
+                    "condition": "C",
+                    "data": [
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "PCC52D03280B7034C",
+                            "model": {
+                                "editorMode": "code",
+                                "format": "table",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "rawQuery": true,
+                                "rawSql": "WITH training AS (\n  SELECT 100 - 100*SUM(CASE WHEN smoker = 0 THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100 - 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'\n)\nSELECT\n  ABS(t.smoker_percent - p.smoker_percent) AS smoker_percent\nFROM training t, pred p",
+                                "refId": "A",
+                                "sql": {
+                                    "columns": [
+                                        {
+                                            "parameters": [],
+                                            "type": "function"
+                                        }
+                                    ],
+                                    "groupBy": [
+                                        {
+                                            "property": {
+                                                "type": "string"
+                                            },
+                                            "type": "groupBy"
+                                        }
+                                    ],
+                                    "limit": 50
+                                }
+                            }
+                        },
+                        {
+                            "refId": "B",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [],
+                                            "type": "gt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": [
+                                                "B"
+                                            ]
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "last"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "A",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "reducer": "last",
+                                "refId": "B",
+                                "type": "reduce"
+                            }
+                        },
+                        {
+                            "refId": "C",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                0
+                                            ],
+                                            "type": "gt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": [
+                                                "C"
+                                            ]
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "last"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "B",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "C",
+                                "type": "threshold"
+                            }
+                        }
+                    ],
+                    "noDataState": "NoData",
+                    "execErrState": "Error",
+                    "for": "1m",
+                    "isPaused": false,
+                    "notification_settings": {
+                        "receiver": "ms_team_channel_tip_prediction"
+                    }
+                }
+            ]
+        }
+    ]
+}

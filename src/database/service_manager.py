@@ -7,6 +7,7 @@ from sqlmodel import select, col, func
 from src.database.models import Predictions, DataIssues
 from src.database.session_manager import SessionManager
 from src.utils.date_time_manager import DateTimeManager
+from src.utils.helper import generate_random_number
 
 
 class DatabaseServiceManager:
@@ -62,6 +63,8 @@ class DatabaseServiceManager:
         new_df = df_with_predictions.copy()
         new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
         new_df["file_path"] = file_path
+        # Generate random values for the true label for testing purposes only
+        new_df["real_tip"] = generate_random_number(1, 30)
         new_df["prediction_source"] = prediction_source
         new_df["predicted_at"] = DateTimeManager.get_current_local_time()
         new_df.to_sql(
@@ -78,6 +81,8 @@ class DatabaseServiceManager:
         new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]
         new_df["file_path"] = file_path
         new_df["prediction_source"] = prediction_source
+        # Generate random values for the true label for testing purposes only
+        new_df["real_tip"] = generate_random_number(1, 30)
         new_df.to_sql(
             "predictions",
             con=self.session.bind,

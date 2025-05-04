@@ -21,6 +21,7 @@ class Predictions(ProjectBaseModel, table=True):
     time: str = Field(nullable=False)
     size: int = Field(nullable=False)
     tip: float = Field(nullable=False)
+    real_tip: float = Field(nullable=False)
     prediction_source: str = Field(nullable=False)
     predicted_at: datetime = Field(nullable=False, index=True)
 
