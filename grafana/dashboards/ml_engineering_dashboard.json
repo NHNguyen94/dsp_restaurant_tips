@@ -22,12 +22,481 @@
   "links": [],
   "panels": [
     {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
+      },
+      "id": 57,
+      "panels": [],
+      "title": "Model performance",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 58,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  CASE\n    WHEN ABS(tip - real_tip) / real_tip * 100 < 10 THEN '< 10%'\n    WHEN ABS(tip - real_tip) / real_tip * 100 < 20 THEN '10% - 20%'\n    WHEN ABS(tip - real_tip) / real_tip * 100 < 30 THEN '20% - 30%'\n    WHEN ABS(tip - real_tip) / real_tip * 100 < 40 THEN '30% - 40%'\n    WHEN ABS(tip - real_tip) / real_tip * 100 < 50 THEN '40% - 50%'\n    ELSE '> 50%'\n  END AS percent_error_bucket,\n  COUNT(*) AS count\nFROM\n  predictions\nWHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()\nGROUP BY\n  percent_error_bucket\nORDER BY\n  percent_error_bucket;\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Predicted vs Real tip",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "from": 5,
+                "result": {
+                  "color": "red",
+                  "index": 0
+                },
+                "to": 10000
+              },
+              "type": "range"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 56,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  'RMSE' AS data,\n  SQRT(AVG(POWER(tip - real_tip, 2))) AS rmse\nFROM\n  predictions\nWHERE predicted_at AT TIME ZONE 'Europe/Paris' >= $__timeFrom()",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "RMSE",
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 54,
+      "panels": [],
+      "title": "Overall statistics",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "id": 53,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT DATE(predicted_at) AS predicted_date,\n  SUM(CASE WHEN prediction_source = 'webapp' THEN 1 ELSE 0 END) AS pred_webapp\nFROM predictions\nGROUP BY 1",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Counts of webapp predictions",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PCC52D03280B7034C"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "id": 55,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxWidth": 4,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT DATE(predicted_at) AS predicted_date,\n  SUM(CASE WHEN prediction_source = 'scheduled_predictions' THEN 1 ELSE 0 END) AS pred_scheduled_predictions\nFROM predictions\nGROUP BY 1",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Counts of scheduled predictions",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
       },
       "id": 39,
       "panels": [],
@@ -85,7 +554,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 19
       },
       "id": 36,
       "options": {
@@ -202,7 +671,7 @@
                         "color": "red",
                         "index": 0
                       },
-                      "to": null
+                      "to": 100
                     },
                     "type": "range"
                   }
@@ -216,7 +685,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 19
       },
       "id": 37,
       "options": {
@@ -317,7 +786,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 9
+        "y": 27
       },
       "id": 24,
       "options": {
@@ -411,7 +880,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 9
+        "y": 27
       },
       "id": 25,
       "options": {
@@ -510,7 +979,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 17
+        "y": 35
       },
       "id": 47,
       "options": {
@@ -616,7 +1085,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 17
+        "y": 35
       },
       "id": 48,
       "options": {
@@ -677,7 +1146,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 43
       },
       "id": 27,
       "panels": [],
@@ -735,7 +1204,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 44
       },
       "id": 43,
       "options": {
@@ -852,7 +1321,7 @@
                         "color": "red",
                         "index": 0
                       },
-                      "to": null
+                      "to": 100
                     },
                     "type": "range"
                   }
@@ -866,7 +1335,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 44
       },
       "id": 49,
       "options": {
@@ -967,7 +1436,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 52
       },
       "id": 31,
       "options": {
@@ -1061,7 +1530,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 52
       },
       "id": 32,
       "options": {
@@ -1160,7 +1629,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 60
       },
       "id": 51,
       "options": {
@@ -1266,7 +1735,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 60
       },
       "id": 52,
       "options": {
@@ -1372,7 +1841,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 50
+        "y": 68
       },
       "id": 45,
       "options": {
@@ -1489,7 +1958,7 @@
                         "color": "red",
                         "index": 0
                       },
-                      "to": null
+                      "to": 100
                     },
                     "type": "range"
                   }
@@ -1503,7 +1972,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 50
+        "y": 68
       },
       "id": 50,
       "options": {
@@ -1604,7 +2073,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 58
+        "y": 76
       },
       "id": 34,
       "options": {
@@ -1698,7 +2167,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 58
+        "y": 76
       },
       "id": 35,
       "options": {
@@ -1752,7 +2221,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 66
+        "y": 84
       },
       "id": 26,
       "panels": [],
@@ -1810,7 +2279,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 67
+        "y": 85
       },
       "id": 28,
       "options": {
@@ -1987,7 +2456,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 67
+        "y": 85
       },
       "id": 38,
       "options": {
@@ -2093,7 +2562,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 78
+        "y": 96
       },
       "id": 33,
       "options": {
@@ -2270,7 +2739,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 78
+        "y": 96
       },
       "id": 40,
       "options": {
@@ -2376,7 +2845,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 89
+        "y": 107
       },
       "id": 29,
       "options": {
@@ -2553,7 +3022,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 89
+        "y": 107
       },
       "id": 41,
       "options": {
@@ -2659,7 +3128,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 100
+        "y": 118
       },
       "id": 30,
       "options": {
@@ -2836,7 +3305,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 100
+        "y": 118
       },
       "id": 42,
       "options": {
@@ -2915,5 +3384,5 @@
   "timezone": "",
   "title": "ML_engineering_dashboard",
   "uid": "aeilce8wamolce",
-  "version": 15
+  "version": 16
 }
