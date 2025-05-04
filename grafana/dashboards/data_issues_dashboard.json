@@ -83,10 +83,6 @@
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 5
               }
             ]
           }
@@ -113,6 +109,27 @@
               {
                 "id": "custom.axisSoftMax",
                 "value": 100
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    },
+                    {
+                      "color": "red",
+                      "value": 10
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.thresholdsStyle",
+                "value": {
+                  "mode": "dashed"
+                }
               }
             ]
           },
@@ -179,30 +196,6 @@
                 "value": "count"
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "bad_csv_percentage_threshold"
-            },
-            "properties": [
-              {
-                "id": "custom.drawStyle",
-                "value": "line"
-              },
-              {
-                "id": "custom.axisLabel",
-                "value": "%"
-              },
-              {
-                "id": "custom.axisSoftMin",
-                "value": 0
-              },
-              {
-                "id": "custom.axisSoftMax",
-                "value": 100
-              }
-            ]
           }
         ]
       },
@@ -239,7 +232,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH file_cnt AS (\n    SELECT DATE(created_at) AS created_date,\n           COUNT(*) AS total_files,\n           SUM(CASE WHEN total_rows IS NULL THEN 1 ELSE 0 END) AS total_bad_csv\n    FROM data_issues\n    WHERE created_at >= $__timeFrom() \n    GROUP BY created_date\n)\nSELECT created_date,\n       f.total_files,\n       f.total_bad_csv,\n       ROUND((f.total_bad_csv * 100.0) / f.total_files, 2) AS bad_csv_percentage\nFROM file_cnt f\n",
+          "rawSql": "WITH file_cnt AS (\n    SELECT DATE(created_at) AS created_date,\n           COUNT(*) AS total_files,\n           SUM(CASE WHEN bad_csv_encoding = 1 OR bad_csv_format = 1 OR other_parse_issues = 1 THEN 1 ELSE 0 END) AS total_bad_csv\n    FROM data_issues\n    WHERE created_at >= $__timeFrom() \n    GROUP BY created_date\n)\nSELECT created_date,\n       f.total_files,\n       f.total_bad_csv,\n       ROUND((f.total_bad_csv * 100.0) / f.total_files, 2) AS bad_csv_percentage\nFROM file_cnt f\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -525,5 +518,5 @@
   "timezone": "browser",
   "title": "Data Dashboard",
   "uid": "eejl8029lcxz4a",
-  "version": 7
+  "version": 8
 }

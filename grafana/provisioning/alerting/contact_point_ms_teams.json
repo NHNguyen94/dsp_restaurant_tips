@@ -1,0 +1,19 @@
+{
+    "apiVersion": 1,
+    "contactPoints": [
+        {
+            "orgId": 1,
+            "name": "ms_team_channel_tip_prediction",
+            "receivers": [
+                {
+                    "uid": "dekuqtetqnpq8f",
+                    "type": "teams",
+                    "settings": {
+                        "url": "https://webhookbot.c-toss.com/api/bot/webhooks/22e68274-2bc4-4698-86bb-9383f63fff3a"
+                    },
+                    "disableResolveMessage": false
+                }
+            ]
+        }
+    ]
+}

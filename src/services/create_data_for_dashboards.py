@@ -33,11 +33,11 @@ def create_data_issues(n: int, from_days_ago: int) -> pd.DataFrame:
         duplicated_rows_list.append(np.random.randint(0, 20))
         unknown_categorical_values_list.append(np.random.randint(0, 20))
         unknon_numeric_values_list.append(np.random.randint(0, 20))
-        bad_csv_encoding_list.append(np.random.randint(0, 2))
-        bad_csv_format_list.append(np.random.randint(0, 2))
-        other_parse_issues_list.append(np.random.randint(0, 2))
-        total_rows_list.append(np.random.randint(0, 2))
-        total_bad_rows_list.append(np.random.randint(0, 2))
+        bad_csv_encoding_list.append(np.random.choice([0, 1], p=[0.95, 0.05]))
+        bad_csv_format_list.append(np.random.choice([0, 1], p=[0.95, 0.05]))
+        other_parse_issues_list.append(np.random.choice([0, 1], p=[0.95, 0.05]))
+        total_rows_list.append(np.random.randint(0, 500))
+        total_bad_rows_list.append(np.random.randint(0, 20))
         created_at_list.append(DateTimeManager.get_random_time_before_now(from_days_ago))
     data = {
         "evaluated_expectations": evaluated_expectations_list,
@@ -107,7 +107,7 @@ def main(n: int, from_days_ago: int, pred_source: str):
 
 
 if __name__ == "__main__":
-    n = 500
+    n = 2000
     from_days_ago = 7
     main(n, from_days_ago, "scheduled_predictions")
     main(n, from_days_ago, "webapp")
