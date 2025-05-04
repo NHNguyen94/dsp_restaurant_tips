@@ -99,7 +99,7 @@
                                     {
                                         "evaluator": {
                                             "params": [
-                                                500
+                                                1000
                                             ],
                                             "type": "lt"
                                         },

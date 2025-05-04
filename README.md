@@ -87,3 +87,25 @@ Important note: $(pwd) does not work for Linux, you have to run `pwd` first, the
 # To retrain the ML model:
 - Run `make pre-process-data`
 - Run `make train-model`
+
+# To prepare fake data for the dashboards:
+- Prepare training data:
+  - Run `make pre-process-data`
+  - Run `make train-model`
+- Prepare fake predicted data:
+  - Run `make data-for-dashboards`
+
+# Explanation for the threshold that triggers the alert:
+- Bad csv parse issue percent: >= 10% (This is a business decision, no further explanation)
+- Successful validation by Great Expectation: <= 80% (This is a business decision, no further explanation)
+- Average bad rows percent: >= 20% (This is a business decision, no further explanation)
+- RMSE between predicted tip and real tip: >= 5
+- Counts of webapp prediction: <= 500 (This is a business decision, no further explanation)
+- Counts of scheduled predictions: <= 1000 (This is a business decision, no further explanation)
+- Skewness difference for tip: >= 1
+- Skewness difference for total bill: >= 1
+- Skewness difference for table size: >= 1
+- Percent difference for gender (Male, Female): >= 30%
+- Percent difference for meal time (Lunch, Dinner): >= 30%
+- Percent difference for smoker (Smoker, No smoker): >= 30%
+- Percent difference for day (Weekday, Weekend): >= 30%
