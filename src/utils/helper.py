@@ -2,6 +2,7 @@ import subprocess
 import uuid
 from typing import Dict, List
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -51,3 +52,7 @@ def find_numerical_values_in_df(df: pd.DataFrame, col: str) -> List[str]:
     new_df = df.copy()
     new_df = new_df.dropna(subset=[col])
     return new_df[new_df[col].apply(lambda x: is_number(x))][col].tolist()
+
+
+def generate_random_number(start: int, end: int) -> float:
+    return np.random.uniform(start, end)

@@ -33,11 +33,11 @@ def create_data_issues(n: int, from_days_ago: int) -> pd.DataFrame:
         duplicated_rows_list.append(np.random.randint(0, 20))
         unknown_categorical_values_list.append(np.random.randint(0, 20))
         unknon_numeric_values_list.append(np.random.randint(0, 20))
-        bad_csv_encoding_list.append(np.random.randint(0, 20))
-        bad_csv_format_list.append(np.random.randint(0, 1))
-        other_parse_issues_list.append(np.random.randint(0, 1))
-        total_rows_list.append(np.random.randint(0, 1))
-        total_bad_rows_list.append(np.random.randint(0, 1))
+        bad_csv_encoding_list.append(np.random.randint(0, 2))
+        bad_csv_format_list.append(np.random.randint(0, 2))
+        other_parse_issues_list.append(np.random.randint(0, 2))
+        total_rows_list.append(np.random.randint(0, 2))
+        total_bad_rows_list.append(np.random.randint(0, 2))
         created_at_list.append(DateTimeManager.get_random_time_before_now(from_days_ago))
     data = {
         "evaluated_expectations": evaluated_expectations_list,
@@ -76,8 +76,8 @@ def create_predictions(n: int, from_days_ago: int) -> pd.DataFrame:
             np.random.choice(["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"])
         )
         time_list.append(np.random.choice(["Lunch", "Dinner"]))
-        size_list.append(np.random.randint(1, 10))
-        tip_list.append(np.random.uniform(0, 100))
+        size_list.append(np.random.randint(1, 20))
+        tip_list.append(np.random.uniform(0, 60))
         predicted_at_list.append(DateTimeManager.get_random_time_before_now(from_days_ago))
     data = {
         "total_bill": total_bill_list,
@@ -92,12 +92,12 @@ def create_predictions(n: int, from_days_ago: int) -> pd.DataFrame:
     return pd.DataFrame(data)
 
 
-def main(n: int, from_days_ago: int):
+def main(n: int, from_days_ago: int, pred_source: str):
     df_predictions = create_predictions(n, from_days_ago)
     db_service_manager.append_df_to_predictions_with_existing_predicted_at(
         df_predictions,
         "auto_gen_for_dashboards",
-        "scheduled_predictions"
+        pred_source
     )
     df_data_issues = create_data_issues(n, from_days_ago)
     db_service_manager.append_df_to_data_issues_with_existing_created_at(
@@ -109,4 +109,5 @@ def main(n: int, from_days_ago: int):
 if __name__ == "__main__":
     n = 500
     from_days_ago = 7
-    main(n, from_days_ago)
+    main(n, from_days_ago, "scheduled_predictions")
+    main(n, from_days_ago, "webapp")
