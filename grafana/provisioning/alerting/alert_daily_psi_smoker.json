@@ -3,13 +3,13 @@
     "groups": [
         {
             "orgId": 1,
-            "name": "daily_smoker_diff_smoke",
+            "name": "daily_psi_smoker",
             "folder": "alerting",
             "interval": "1m",
             "rules": [
                 {
-                    "uid": "fekv31ylj6jnkf",
-                    "title": "daily_smoker_diff_smoke",
+                    "uid": "bel08fegu3fnkd",
+                    "title": "daily_psi_smoker",
                     "condition": "C",
                     "data": [
                         {
@@ -25,7 +25,7 @@
                                 "intervalMs": 1000,
                                 "maxDataPoints": 43200,
                                 "rawQuery": true,
-                                "rawSql": "WITH training AS (\n  SELECT 100 - 100*SUM(CASE WHEN smoker = 0 THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100 - 100*SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END)/COUNT(*) AS smoker_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'\n)\nSELECT\n  ABS(t.smoker_percent - p.smoker_percent) AS smoker_percent\nFROM training t, pred p",
+                                "rawSql": "WITH training AS (\n  SELECT \n    1.0 * SUM(CASE WHEN smoker = 0 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS expected_nonsmoker,\n    1.0 * SUM(CASE WHEN smoker = 1 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS expected_smoker\n  FROM training_data\n),\npred AS (\n  SELECT \n    1.0 * SUM(CASE WHEN smoker = 'No' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS actual_nonsmoker,\n    1.0 * SUM(CASE WHEN smoker = 'Yes' THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS actual_smoker\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'\n),\npsi_calc AS (\n  SELECT\n    -- Avoid division by zero and log of zero with CASE WHEN\n    CASE \n      WHEN expected_nonsmoker > 0 AND actual_nonsmoker > 0 \n      THEN (actual_nonsmoker - expected_nonsmoker) * LN(actual_nonsmoker / expected_nonsmoker)\n      ELSE 0 \n    END AS psi_no,\n    \n    CASE \n      WHEN expected_smoker > 0 AND actual_smoker > 0 \n      THEN (actual_smoker - expected_smoker) * LN(actual_smoker / expected_smoker)\n      ELSE 0 \n    END AS psi_yes\n  FROM training, pred\n)\nSELECT \n  psi_no + psi_yes AS total_psi\nFROM psi_calc;",
                                 "refId": "A",
                                 "sql": {
                                     "columns": [
@@ -99,9 +99,9 @@
                                     {
                                         "evaluator": {
                                             "params": [
-                                                0
+                                                0.2
                                             ],
-                                            "type": "gt"
+                                            "type": "gte"
                                         },
                                         "operator": {
                                             "type": "and"
