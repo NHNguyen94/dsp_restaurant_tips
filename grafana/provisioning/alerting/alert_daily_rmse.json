@@ -8,7 +8,7 @@
             "interval": "1m",
             "rules": [
                 {
-                    "uid": "cekv0r4vldfcwf",
+                    "uid": "cel07n8jvk1kwd",
                     "title": "daily_rmse",
                     "condition": "C",
                     "data": [
@@ -25,7 +25,7 @@
                                 "intervalMs": 1000,
                                 "maxDataPoints": 43200,
                                 "rawQuery": true,
-                                "rawSql": "SELECT\n  'RMSE' AS metric,\n  SQRT(AVG(POWER(tip - real_tip, 2))) AS value\nFROM\n  predictions\nWHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'",
+                                "rawSql": "SELECT\n  SQRT(AVG(POWER(tip - real_tip, 2))) AS rmse\nFROM\n  predictions\nWHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'",
                                 "refId": "A",
                                 "sql": {
                                     "columns": [
@@ -99,9 +99,9 @@
                                     {
                                         "evaluator": {
                                             "params": [
-                                                0
+                                                0.2
                                             ],
-                                            "type": "gt"
+                                            "type": "gte"
                                         },
                                         "operator": {
                                             "type": "and"

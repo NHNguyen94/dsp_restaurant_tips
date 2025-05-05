@@ -3,13 +3,13 @@
     "groups": [
         {
             "orgId": 1,
-            "name": "daily_meal_time_diff_weekday",
+            "name": "daily_psi_meal_day",
             "folder": "alerting",
             "interval": "1m",
             "rules": [
                 {
-                    "uid": "eekv398jjpgqoc",
-                    "title": "daily_meal_time_diff_weekday",
+                    "uid": "bel08jashqy2of",
+                    "title": "daily_psi_meal_day",
                     "condition": "C",
                     "data": [
                         {
@@ -25,7 +25,7 @@
                                 "intervalMs": 1000,
                                 "maxDataPoints": 43200,
                                 "rawQuery": true,
-                                "rawSql": "WITH training AS (\n  SELECT 100*SUM(CASE WHEN day not in (1, 7) THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent\n  FROM training_data\n),\npred AS (\n  SELECT 100*SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END)/COUNT(*) AS weekday_percent\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'\n)\nSELECT\n  ABS(t.weekday_percent - p.weekday_percent) AS weekday_percent\nFROM training t, pred p",
+                                "rawSql": "WITH training AS (\n  SELECT \n    1.0 * SUM(CASE WHEN day not in (1, 7) THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS expected_weekday,\n    1.0 * SUM(CASE WHEN day in (1, 7) THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS expected_weekend\n  FROM training_data\n),\npred AS (\n  SELECT \n    1.0 * SUM(CASE WHEN day not in ('Sun', 'Sat') THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS actual_weekday,\n    1.0 * SUM(CASE WHEN day in ('Sun', 'Sat') THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS actual_weekend\n  FROM predictions\n  WHERE predicted_at AT TIME ZONE 'Europe/Paris' >= now() - interval '1 day'\n),\npsi_calc AS (\n  SELECT\n    -- Avoid division by zero and log of zero with CASE WHEN\n    CASE \n      WHEN expected_weekday > 0 AND actual_weekday > 0 \n      THEN (actual_weekday - expected_weekday) * LN(actual_weekday / expected_weekday)\n      ELSE 0 \n    END AS psi_weekday,\n    \n    CASE \n      WHEN expected_weekend > 0 AND actual_weekend > 0 \n      THEN (actual_weekend - expected_weekend) * LN(actual_weekend / expected_weekend)\n      ELSE 0 \n    END AS psi_weekend\n  FROM training, pred\n)\nSELECT \n  psi_weekday + psi_weekend AS total_psi\nFROM psi_calc;",
                                 "refId": "A",
                                 "sql": {
                                     "columns": [
@@ -99,9 +99,9 @@
                                     {
                                         "evaluator": {
                                             "params": [
-                                                30
+                                                -2.8
                                             ],
-                                            "type": "gt"
+                                            "type": "gte"
                                         },
                                         "operator": {
                                             "type": "and"
