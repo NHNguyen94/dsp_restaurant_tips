@@ -102,7 +102,7 @@ Important note: $(pwd) does not work for Linux, you have to run `pwd` first, the
 - RMSE between predicted tip and real tip: >= 0.2 (when normalizing the RMSE value, using this formular threshold/(Highest_Real_Tip - Lowest_Real_Tip) = 0.2/(29.713-8.125) = 0.009 which can better show how fit the model  to the reality. Source for the reason/calculation: https://www.statology.org/what-is-a-good-rmse/)
 - Counts of webapp prediction: <= 500 (This is a business decision, no further explanation)
 - Counts of scheduled predictions: <= 1000 (This is a business decision, no further explanation)
-- Absolute skewness difference for tip: >= 1 or <= -1 (This is a generally acceptable for normal distribution. Source: https://ogs.edu/how-to-conduct-normality-tests-using-pspp-in-statistics-for-social-research/)
-- Absolute skewness difference for total bill: >= 1
-- Absolute skewness difference for table size: >= 1
-- PSI for categorical features (sex, smoker, day and time): >= 0.2
+- Absolute skewness difference for tip: >= 1 (This is a generally acceptable for normal distribution. Source: https://ogs.edu/how-to-conduct-normality-tests-using-pspp-in-statistics-for-social-research/)
+- Absolute skewness difference for total bill: >= 1 (Same as above)
+- Absolute skewness difference for table size: >= 1 (Same as above)
+- PSI for categorical features (sex, smoker, day and time): >= 0.2 (Population Stability Index (PSI) compare the distribution of training data with inference data, we use this to check for data drift. Source: https://medium.com/model-monitoring-psi/population-stability-index-psi-ab133b0a5d42)
