@@ -22,8 +22,7 @@ class DatabaseServiceManager:
             session.commit()
 
     def append_df_to_data_issues_with_existing_created_at(
-            self, df: pd.DataFrame,
-            file_path: str
+        self, df: pd.DataFrame, file_path: str
     ) -> None:
         new_df = df.copy()
         new_df["id"] = [uuid.uuid4() for _ in range(len(new_df))]

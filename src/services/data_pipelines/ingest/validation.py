@@ -349,6 +349,8 @@ class ValidationService:
                     ].astype(v["type"])
 
     def validate_columns_dtype(self) -> List[GXResultPerColumn]:
+        # Manual validation for the column type
+        # Because GX cannot parse DF properly if the dtype is mixed
         if self.good_csv_parsed == False:
             raise ValueError("The CSV has issue, cannot validate the data")
         else:

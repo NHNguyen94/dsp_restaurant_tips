@@ -44,13 +44,18 @@ def _parse_validated_results_with_good_csv(
     # if there is a missing column => The whole dataset is invalid
     if missing_columns > 0:
         success_percent = 0
-        unsuccessful_expectations = validated_result.overall_statistics.evaluated_expectations
+        unsuccessful_expectations = (
+            validated_result.overall_statistics.evaluated_expectations
+        )
         successful_expectations = 0
     else:
         success_percent = validated_result.overall_statistics.success_percent
-        unsuccessful_expectations = validated_result.overall_statistics.unsuccessful_expectations
-        successful_expectations = validated_result.overall_statistics.successful_expectations
-
+        unsuccessful_expectations = (
+            validated_result.overall_statistics.unsuccessful_expectations
+        )
+        successful_expectations = (
+            validated_result.overall_statistics.successful_expectations
+        )
 
     return DataIssues(
         file_path=validated_result.file_path,

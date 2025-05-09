@@ -38,7 +38,9 @@ def create_data_issues(n: int, from_days_ago: int) -> pd.DataFrame:
         other_parse_issues_list.append(np.random.choice([0, 1], p=[0.95, 0.05]))
         total_rows_list.append(np.random.randint(0, 500))
         total_bad_rows_list.append(np.random.randint(0, 20))
-        created_at_list.append(DateTimeManager.get_random_time_before_now(from_days_ago))
+        created_at_list.append(
+            DateTimeManager.get_random_time_before_now(from_days_ago)
+        )
     data = {
         "evaluated_expectations": evaluated_expectations_list,
         "successful_expectations": successful_expectations_list,
@@ -54,7 +56,7 @@ def create_data_issues(n: int, from_days_ago: int) -> pd.DataFrame:
         "other_parse_issues": other_parse_issues_list,
         "total_rows": total_rows_list,
         "total_bad_rows": total_bad_rows_list,
-        "created_at": created_at_list
+        "created_at": created_at_list,
     }
     return pd.DataFrame(data)
 
@@ -78,7 +80,9 @@ def create_predictions(n: int, from_days_ago: int) -> pd.DataFrame:
         time_list.append(np.random.choice(["Lunch", "Dinner"]))
         size_list.append(np.random.randint(1, 20))
         tip_list.append(np.random.uniform(0, 60))
-        predicted_at_list.append(DateTimeManager.get_random_time_before_now(from_days_ago))
+        predicted_at_list.append(
+            DateTimeManager.get_random_time_before_now(from_days_ago)
+        )
     data = {
         "total_bill": total_bill_list,
         "sex": sex_list,
@@ -95,14 +99,11 @@ def create_predictions(n: int, from_days_ago: int) -> pd.DataFrame:
 def main(n: int, from_days_ago: int, pred_source: str):
     df_predictions = create_predictions(n, from_days_ago)
     db_service_manager.append_df_to_predictions_with_existing_predicted_at(
-        df_predictions,
-        "auto_gen_for_dashboards",
-        pred_source
+        df_predictions, "auto_gen_for_dashboards", pred_source
     )
     df_data_issues = create_data_issues(n, from_days_ago)
     db_service_manager.append_df_to_data_issues_with_existing_created_at(
-        df_data_issues,
-        "auto_gen_for_dashboards"
+        df_data_issues, "auto_gen_for_dashboards"
     )
 
 
